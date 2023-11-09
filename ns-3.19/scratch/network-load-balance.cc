@@ -631,24 +631,29 @@ void CalculateRoute(Ptr<Node> host) {
             if (!it->second.up) continue;
             Ptr<Node> next = it->first;
             // If 'next' have not been visited.
-            if (dis.find(next) == dis.end()) {
-                dis[next] = d + 1;
+            if (dis.find(next) == dis.end()) {  // 邻居节点 next 还没有被访问过（距离未知）
+                dis[next] = d + 1;  // 更新距离（dis[next]）为当前节点到邻居节点的距离加一
+                // 更新延迟（delay[next]）为当前节点到邻居节点的延迟之和
                 delay[next] = delay[now] + it->second.delay;  // maybe nanoseconds?
+                // 更新发送延迟（txDelay[next]）为当前节点到邻居节点的发送延迟之和
                 txDelay[next] = txDelay[now] + packet_payload_size * 1000000000lu * 8 /
                                                    it->second.bw;  // maybe nanoseconds?
+                // 更新带宽（bw[next]）为当前节点和邻居节点之间的带宽的较小值
                 bw[next] = std::min(bw[now], it->second.bw);
                 // we only enqueue switch, because we do not want packets to go through host as
                 // middle point
-                if (next->GetNodeType() == 1) {
+                if (next->GetNodeType() == 1) {  // 如果邻居节点是交换机（节点类型为1），则将其添加到 BFS 队列中，以便进一步探索
                     q.push_back(next);
                 }
             }
             // if 'now' is on the shortest path from 'next' to 'host'.
+            // 如果某个节点 next 与主机的距离等于当前节点 now 到主机的距离加一，说明 now 是 next 的最短路径上的一个节点
             if (d + 1 == dis[next]) {
-                nextHop[next][host].push_back(now);
+                nextHop[next][host].push_back(now);  // 将 now 添加到 next 到主机的最短路径中
             }
         }
     }
+    // 保存延迟、发送延迟和带宽信息
     for (auto it : delay) {
         pairDelay[it.first][host] = it.second;
     }
@@ -674,11 +679,11 @@ void CalculateRoutes(NodeContainer &n) {
 void SetRoutingEntries() {
     // For each node.
     for (auto i = nextHop.begin(); i != nextHop.end(); i++) {
-        Ptr<Node> node = i->first;
+        Ptr<Node> node = i->first;  // 路径的起点
         auto &table = i->second;
         for (auto j = table.begin(); j != table.end(); j++) {
             // The destination node.
-            Ptr<Node> dst = j->first;
+            Ptr<Node> dst = j->first;  // 路径的终点
             // The IP address of the dst.
             Ipv4Address dstAddr = dst->GetObject<Ipv4>()->GetAddress(1, 0).GetLocal();
             // The next hops towards the dst.
@@ -686,9 +691,12 @@ void SetRoutingEntries() {
             for (int k = 0; k < (int)nexts.size(); k++) {
                 Ptr<Node> next = nexts[k];
                 uint32_t interface = nbr2if[node][next].idx;
-                if (node->GetNodeType() == 1)
+                if (node->GetNodeType() == 1){  // 起点是交换机
+                    // 调用 AddTableEntry 方法，将目标地址 dstAddr 与接口索引关联起来，从而设置路由表条目
                     DynamicCast<SwitchNode>(node)->AddTableEntry(dstAddr, interface);
-                else {
+                }
+                else {  // 起点非交换机
+                    // 通过主机的 RdmaDriver 访问 RDMA（Remote Direct Memory Access）驱动，并调用 AddTableEntry 方法设置路由表条目
                     node->GetObject<RdmaDriver>()->m_rdma->AddTableEntry(dstAddr, interface);
                 }
             }
@@ -1558,6 +1566,7 @@ int main(int argc, char *argv[]) {
     /* config load balancer's switches using ToR-to-ToR routing */
     if (lb_mode == 3 || lb_mode == 6 || lb_mode == 9) {  // Conga, Letflow, Conweave
         NS_LOG_INFO("Configuring Load Balancer's Switches");
+        // 建立主机IP到交换机ID的映射hostIp2SwitchId
         for (auto &pair : link_pairs) {
             Ptr<Node> probably_host = n.Get(pair.first);
             Ptr<Node> probably_switch = n.Get(pair.second);
@@ -1579,15 +1588,17 @@ int main(int argc, char *argv[]) {
                 Ptr<SwitchNode> swSrc = DynamicCast<SwitchNode>(nodeSrc);  // switch
                 uint32_t swSrcId = swSrc->GetId();
 
-                if (swSrc->m_isToR) {
+                if (swSrc->m_isToR) {  // 源交换机是ToR
                     // printf("--- ToR Switch %d\n", swSrcId);
 
                     auto table1 = i->second;
                     for (auto j = table1.begin(); j != table1.end(); j++) {
-                        Ptr<Node> dst = j->first;  // dst
+                        Ptr<Node> dst = j->first;  // dst 路径终点
                         uint32_t dstIP = Settings::hostId2IpMap[dst->GetId()];
                         uint32_t swDstId = Settings::hostIp2SwitchId[dstIP];  // Rx(dst)ToR
 
+                        // 检查源节点和目标节点是否属于同一Pod（交换机ID相同），
+                        // 如果是，则跳过当前目标节点，因为在同一Pod内不需要进行路由，直接连接
                         if (swSrcId == swDstId) {
                             continue;  // if in the same pod, then skip
                         }
@@ -1603,10 +1614,11 @@ int main(int argc, char *argv[]) {
                         // construct paths
                         uint32_t pathId;
                         uint8_t path_ports[4] = {0, 0, 0, 0};  // interface is always large than 0
-                        vector<Ptr<Node>> nexts1 = j->second;
+                        vector<Ptr<Node>> nexts1 = j->second;  // 起点到终点的中间结点
                         for (auto next1 : nexts1) {
                             uint32_t outPort1 = nbr2if[nodeSrc][next1].idx;
                             auto nexts2 = nextHop[next1][dst];
+                            // 2跳
                             if (nexts2.size() == 1 && nexts2[0]->GetId() == swDstId) {
                                 // this destination has 2-hop distance
                                 uint32_t outPort2 = nbr2if[next1][nexts2[0]].idx;
@@ -1616,15 +1628,15 @@ int main(int argc, char *argv[]) {
                                 path_ports[0] = (uint8_t)outPort1;
                                 path_ports[1] = (uint8_t)outPort2;
                                 pathId = *((uint32_t *)path_ports);
-                                if (lb_mode == 3) {
+                                if (lb_mode == 3) {  // conga
                                     swSrc->m_mmu->m_congaRouting.m_congaRoutingTable[swDstId]
                                         .insert(pathId);
                                 }
-                                if (lb_mode == 6) {
+                                if (lb_mode == 6) {  // letflow
                                     swSrc->m_mmu->m_letflowRouting.m_letflowRoutingTable[swDstId]
                                         .insert(pathId);
                                 }
-                                if (lb_mode == 9) {
+                                if (lb_mode == 9) {  // conweave
                                     swSrc->m_mmu->m_conweaveRouting.m_ConWeaveRoutingTable[swDstId]
                                         .insert(pathId);
                                     swSrc->m_mmu->m_conweaveRouting.m_rxToRId2BaseRTT[swDstId] =
@@ -1636,6 +1648,7 @@ int main(int argc, char *argv[]) {
                             for (auto next2 : nexts2) {
                                 uint32_t outPort2 = nbr2if[next1][next2].idx;
                                 auto nexts3 = nextHop[next2][dst];
+                                // 3跳
                                 if (nexts3.size() == 1 && nexts3[0]->GetId() == swDstId) {
                                     // this destination has 3-hop distance
                                     uint32_t outPort3 = nbr2if[next2][nexts3[0]].idx;
@@ -1727,6 +1740,8 @@ int main(int argc, char *argv[]) {
                     for (auto next : j->second) {
                         uint32_t outPort = nbr2if[node][next].idx;
                         uint64_t bw = nbr2if[node][next].bw;
+                        // 使用 sw->m_mmu->m_congaRouting.SetLinkCapacity 方法，
+                        // 将输出端口 outPort 映射到对应的带宽 bw，这样交换机就知道每个输出端口的带宽信息
                         sw->m_mmu->m_congaRouting.SetLinkCapacity(outPort, bw);
                         // printf("Node: %d, interface: %d, bw: %lu\n", swId, outPort, bw);
                     }

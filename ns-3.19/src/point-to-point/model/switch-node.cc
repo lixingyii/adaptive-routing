@@ -65,6 +65,7 @@ uint32_t SwitchNode::DoLbFlowECMP(Ptr<const Packet> p, const CustomHeader &ch,
         uint8_t u8[4 + 4 + 2 + 2];
         uint32_t u32[3];
     } buf;
+    // 将数据包头部信息（源 IP 地址、目标 IP 地址、协议类型、端口信息）存储到 buf 中
     buf.u32[0] = ch.sip;
     buf.u32[1] = ch.dip;
     if (ch.l3Prot == 0x6)
@@ -80,7 +81,9 @@ uint32_t SwitchNode::DoLbFlowECMP(Ptr<const Packet> p, const CustomHeader &ch,
         assert(false && "Cannot support other protoocls than TCP/UDP");
     }
 
+    // 使用哈希函数 EcmpHash 对 buf 进行哈希计算，得到哈希值 hashVal
     uint32_t hashVal = EcmpHash(buf.u8, 12, m_ecmpSeed);
+    // 将哈希值 hashVal 对下一跳节点数量取模，以确定应该选择哪一个下一跳节点
     uint32_t idx = hashVal % nexthops.size();
     return nexthops[idx];
 }
@@ -93,14 +96,20 @@ uint32_t SwitchNode::DoLbConga(Ptr<Packet> p, CustomHeader &ch, const std::vecto
 /*-----------------Letflow-----------------*/
 uint32_t SwitchNode::DoLbLetflow(Ptr<Packet> p, CustomHeader &ch,
                                  const std::vector<int> &nexthops) {
+    // 代码检查当前节点是否为 ToR（Top of Rack）交换机（m_isToR）并且下一跳的数量是否为 1
+    // 用于判断是否是机架内的通信（intra-pod traffic）
     if (m_isToR && nexthops.size() == 1) {
         if (m_isToR_hostIP.find(ch.sip) != m_isToR_hostIP.end() &&
             m_isToR_hostIP.find(ch.dip) != m_isToR_hostIP.end()) {
+            // 返回唯一的下一跳端口
             return nexthops[0];  // intra-pod traffic
         }
     }
 
     /* ONLY called for inter-Pod traffic */
+    // 如果数据包是用于机架之间的通信（inter-pod traffic），
+    // 则调用 m_mmu->m_letflowRouting.RouteInput(p, ch) 来选择输出端口。
+    // 如果没有找到合适的输出端口，就会使用唯一的下一跳端口
     uint32_t outPort = m_mmu->m_letflowRouting.RouteInput(p, ch);
     if (outPort == LETFLOW_NULL) {
         assert(nexthops.size() == 1);  // Receiver's TOR has only one interface to receiver-server
@@ -116,25 +125,34 @@ uint32_t SwitchNode::CalculateInterfaceLoad(uint32_t interface) {
     Ptr<QbbNetDevice> device = DynamicCast<QbbNetDevice>(m_devices[interface]);
     NS_ASSERT_MSG(!!device && !!device->GetQueue(),
                   "Error of getting a egress queue for calculating interface load");
+    // 返回与给定接口关联的设备队列的总字节数，即当前的接口负载
     return device->GetQueue()->GetNBytesTotal();  // also used in HPCC
 }
 
 uint32_t SwitchNode::DoLbDrill(Ptr<const Packet> p, const CustomHeader &ch,
                                const std::vector<int> &nexthops) {
     // find the Egress (output) link with the smallest local Egress Queue length
+    // 用于跟踪最小负载的输出端口和负载大小
     uint32_t leastLoadInterface = 0;
     uint32_t leastLoad = std::numeric_limits<uint32_t>::max();
     auto rand_nexthops = nexthops;
+    // 代码随机打乱 nexthops 中的下一跳端口的顺序，以避免每次都选择相同的下一跳
     std::random_shuffle(rand_nexthops.begin(), rand_nexthops.end());
 
+    // 检查数据包的目标 IP 地址（ch.dip）是否已经在 m_previousBestInterfaceMap 中记录了，
+    // 如果记录了，就获取上次选择的最佳输出端口 leastLoadInterface 和对应的负载 leastLoad
     std::map<uint32_t, uint32_t>::iterator itr = m_previousBestInterfaceMap.find(ch.dip);
     if (itr != m_previousBestInterfaceMap.end()) {
         leastLoadInterface = itr->second;
         leastLoad = CalculateInterfaceLoad(itr->second);
     }
 
+    // 计算采样的数量 sampleNum，这个数量等于 m_drill_candidate 和随机打乱后的下一跳端口数之间的较小值
     uint32_t sampleNum =
         m_drill_candidate < rand_nexthops.size() ? m_drill_candidate : rand_nexthops.size();
+    // 遍历这些采样的下一跳端口，
+    // 通过调用 CalculateInterfaceLoad 函数来计算每个输出端口的当前负载大小，并将其与 leastLoad 比较。
+    // 如果找到更小的负载，就更新 leastLoad 和 leastLoadInterface
     for (uint32_t samplePort = 0; samplePort < sampleNum; samplePort++) {
         uint32_t sampleLoad = CalculateInterfaceLoad(rand_nexthops[samplePort]);
         if (sampleLoad < leastLoad) {
@@ -142,6 +160,7 @@ uint32_t SwitchNode::DoLbDrill(Ptr<const Packet> p, const CustomHeader &ch,
             leastLoadInterface = rand_nexthops[samplePort];
         }
     }
+    // 将选择的输出端口 leastLoadInterface 存储在 m_previousBestInterfaceMap 中，并将其返回作为数据包的下一跳
     m_previousBestInterfaceMap[ch.dip] = leastLoadInterface;
     return leastLoadInterface;
 }
@@ -156,11 +175,12 @@ uint32_t SwitchNode::DoLbConWeave(Ptr<const Packet> p, const CustomHeader &ch,
 void SwitchNode::CheckAndSendPfc(uint32_t inDev, uint32_t qIndex) {
     Ptr<QbbNetDevice> device = DynamicCast<QbbNetDevice>(m_devices[inDev]);
     bool pClasses[qCnt] = {0};
+    // 获取指定接口和队列的暂停（Pause）类别信息，结果存储在名为 pClasses 的数组中
     m_mmu->GetPauseClasses(inDev, qIndex, pClasses);
     for (int j = 0; j < qCnt; j++) {
-        if (pClasses[j]) {
-            uint32_t paused_time = device->SendPfc(j, 0);
-            m_mmu->SetPause(inDev, j, paused_time);
+        if (pClasses[j]) {  // 检查每个队列是否需要发送 PFC 帧（以暂停或恢复流量）。如果 pClasses[j] 为真，表示该队列需要发送 PFC 帧
+            uint32_t paused_time = device->SendPfc(j, 0);  // 第二个参数 0 表示暂停流量
+            m_mmu->SetPause(inDev, j, paused_time);  // 函数更新 PFC 状态并记录暂停时间
             m_mmu->m_pause_remote[inDev][j] = true;
             /** PAUSE SEND COUNT ++ */
         }
@@ -169,8 +189,8 @@ void SwitchNode::CheckAndSendPfc(uint32_t inDev, uint32_t qIndex) {
     for (int j = 0; j < qCnt; j++) {
         if (!m_mmu->m_pause_remote[inDev][j]) continue;
 
-        if (m_mmu->GetResumeClasses(inDev, j)) {
-            device->SendPfc(j, 1);
+        if (m_mmu->GetResumeClasses(inDev, j)) {  // 检查每个队列的 PFC 恢复状态，如果需要发送 PFC 恢复帧
+            device->SendPfc(j, 1);  // 第二个参数 1 表示恢复流量
             m_mmu->SetResume(inDev, j);
             m_mmu->m_pause_remote[inDev][j] = false;
         }
@@ -219,22 +239,25 @@ void SwitchNode::SendToDev(Ptr<Packet> p, CustomHeader &ch) {
 
 void SwitchNode::SendToDevContinue(Ptr<Packet> p, CustomHeader &ch) {
     int idx = GetOutDev(p, ch);
-    if (idx >= 0) {
+    if (idx >= 0) {  // 如果找到有效的输出设备，函数将确定要将数据包放入的队列（qIndex）
         NS_ASSERT_MSG(m_devices[idx]->IsLinkUp(),
                       "The routing table look up should return link that is up");
 
         // determine the qIndex
         uint32_t qIndex;
+        // 如果是QCN、PFC或ACK/NACK，执行最高优先级
         if (ch.l3Prot == 0xFF || ch.l3Prot == 0xFE ||
             (m_ackHighPrio &&
              (ch.l3Prot == 0xFD ||
               ch.l3Prot == 0xFC))) {  // QCN or PFC or ACK/NACK, go highest priority
             qIndex = 0;               // high priority
         } else {
+            // 如果是TCP，放在队列1，否则放在队列3
             qIndex = (ch.l3Prot == 0x06 ? 1 : ch.udp.pg);  // if TCP, put to queue 1. Otherwise, it
                                                            // would be 3 (refer to trafficgen)
         }
 
+        // 将数据包发送到输出设备的指定队列
         DoSwitchSend(p, ch, idx, qIndex);  // m_devices[idx]->SwitchSend(qIndex, p, ch);
         return;
     }
@@ -244,6 +267,7 @@ void SwitchNode::SendToDevContinue(Ptr<Packet> p, CustomHeader &ch) {
 
 int SwitchNode::GetOutDev(Ptr<Packet> p, CustomHeader &ch) {
     // look up entries
+    // 尝试查找 m_rtTable 中是否有与数据包目的 IP 地址 (ch.dip) 匹配的路由表项（entry）
     auto entry = m_rtTable.find(ch.dip);
 
     // no matching entry
@@ -255,6 +279,7 @@ int SwitchNode::GetOutDev(Ptr<Packet> p, CustomHeader &ch) {
     }
 
     // entry found
+    // 如果找到匹配的路由表项，函数将获取该路由表项指定的下一跳设备列表（nexthops）
     const auto &nexthops = entry->second;
     bool control_pkt =
         (ch.l3Prot == 0xFF || ch.l3Prot == 0xFE || ch.l3Prot == 0xFD || ch.l3Prot == 0xFC);
