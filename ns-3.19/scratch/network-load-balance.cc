@@ -68,6 +68,10 @@ double conga_alpha = 0.2;
 Time letflow_flowletTimeout = MicroSeconds(100);  // 100us
 Time letflow_agingTime = MilliSeconds(2);  // just to clear the unused map entries for simul speed
 
+// AdaptiveRouting params
+Time adaptive_flowletTimeout = MicroSeconds(100);  // 100us
+Time adaptive_agingTime = MilliSeconds(2);  // just to clear the unused map entries for simul speed
+
 // Conweave params
 // θreply，Continuous RTT monitoring中RTT_REPLY的超时值
 Time conweave_extraReplyDeadline = MicroSeconds(4);       // additional term to reply deadline
@@ -419,6 +423,15 @@ void letflow_history_print() {
 }
 
 /**
+ * @brief AdaptiveRouting timeout number recording
+ */
+void adaptive_history_print() {
+    std::cout << "\n------------AdaptiveRouting History---------------" << std::endl;
+    std::cout << "Number of flowlet's timeout:" << AdaptiveRouting::nFlowletTimeout
+              << "\nLetflow's timeout: " << adaptive_flowletTimeout << std::endl;
+}
+
+/**
  * @brief Conweave rerouting/VOQ number recording
  */
 void conweave_history_print() {
@@ -596,6 +609,9 @@ void stop_simulation_middle() {
         }
         if (lb_mode == 9) {  // CONWEAVE
             conweave_history_print();
+        }
+        if (lb_mode == 11) {
+            adaptive_history_print();
         }
         Simulator::Stop(NanoSeconds(1));  // finish soon, stop this schedule (NECESSARY!)
         return;
@@ -1564,7 +1580,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* config load balancer's switches using ToR-to-ToR routing */
-    if (lb_mode == 3 || lb_mode == 6 || lb_mode == 9) {  // Conga, Letflow, Conweave
+    if (lb_mode == 3 || lb_mode == 6 || lb_mode == 9 || lb_mode == 11) {  // Conga, Letflow, Conweave
         NS_LOG_INFO("Configuring Load Balancer's Switches");
         // 建立主机IP到交换机ID的映射hostIp2SwitchId
         for (auto &pair : link_pairs) {
@@ -1582,6 +1598,7 @@ int main(int argc, char *argv[]) {
         // Conga: m_congaFromLeafTable, m_congaToLeafTable, m_congaRoutingTable
         // Letflow: m_letflowRoutingTable
         // Conweave: m_ConWeaveRoutingTable, m_rxToRId2BaseRTT
+        // AdaptiveRouting:m_adaptiveRoutingTable
         for (auto i = nextHop.begin(); i != nextHop.end(); i++) {  // every node
             if (i->first->GetNodeType() == 1) {                    // switch
                 Ptr<Node> nodeSrc = i->first;
@@ -1642,6 +1659,10 @@ int main(int argc, char *argv[]) {
                                     swSrc->m_mmu->m_conweaveRouting.m_rxToRId2BaseRTT[swDstId] =
                                         one_hop_delay * 4;
                                 }
+                                if (lb_mode == 11) {
+                                    swSrc->m_mmu->m_adaptiveRouting.m_adaptiveRoutingTable[swDstId]
+                                        .insert(pathId);
+                                }
                                 continue;
                             }
 
@@ -1674,6 +1695,11 @@ int main(int argc, char *argv[]) {
                                             .insert(pathId);
                                         swSrc->m_mmu->m_conweaveRouting.m_rxToRId2BaseRTT[swDstId] =
                                             one_hop_delay * 6;
+                                    }
+                                    if (lb_mode == 11){
+                                        swSrc->m_mmu->m_adaptiveRouting
+                                            .m_adaptiveRoutingTable[swDstId]
+                                            .insert(pathId);
                                     }
                                     continue;
                                 }
@@ -1710,6 +1736,11 @@ int main(int argc, char *argv[]) {
                                                 .insert(pathId);
                                             swSrc->m_mmu->m_conweaveRouting
                                                 .m_rxToRId2BaseRTT[swDstId] = one_hop_delay * 8;
+                                        }
+                                        if (lb_mode == 11) {
+                                            swSrc->m_mmu->m_adaptiveRouting
+                                                .m_adaptiveRoutingTable[swDstId]
+                                                .insert(pathId);
                                         }
                                         continue;
                                     } else {
@@ -1773,6 +1804,11 @@ int main(int argc, char *argv[]) {
                         conweave_pathPauseTime, conweave_pathAwareRerouting);
                     sw->m_mmu->m_conweaveRouting.SetSwitchInfo(sw->m_isToR, sw->GetId());
                 }
+                if (lb_mode == 11) {
+                    sw->m_mmu->m_adaptiveRouting.SetConstants(adaptive_agingTime,
+                                                            adaptive_flowletTimeout);
+                    sw->m_mmu->m_adaptiveRouting.SetSwitchInfo(sw->m_isToR, sw->GetId());
+                }
             }
         }
 
@@ -1788,6 +1824,10 @@ int main(int argc, char *argv[]) {
         if (lb_mode == 9) {  // CONWEAVE
             Simulator::Schedule(Seconds(flowgen_stop_time + simulator_extra_time),
                                 conweave_history_print);
+        }
+        if (lb_mode == 11) {
+            Simulator::Schedule(Seconds(flowgen_stop_time + simulator_extra_time),
+                                adaptive_history_print);
         }
     }
 

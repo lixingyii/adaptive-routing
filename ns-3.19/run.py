@@ -107,6 +107,7 @@ lb_modes = {
     "conga": 3,
     "letflow": 6,
     "conweave": 9,
+    "adaptive": 11,
 }
 
 topo2bdp = {
@@ -218,6 +219,8 @@ def main():
         config_ID += 'conweave_'
     elif lb_mode == 2:
         config_ID += 'drill_'
+    elif lb_mode == 11:
+        config_ID += 'adaptive_'
 
     config_ID += args.algorithm + '_' + args.implementation + '_' + args.physical_dims + '_'
     config_ID += datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
@@ -225,9 +228,9 @@ def main():
 
     # get over-subscription ratio from topoogy name
     netload = args.netload
-    oversub = int(topo.replace("\n", "").split("OS")[-1].replace(".txt", ""))
-    assert (int(args.netload) % oversub == 0)
-    hostload = int(args.netload) / oversub
+    # oversub = int(topo.replace("\n", "").split("OS")[-1].replace(".txt", ""))
+    # assert (int(args.netload) % oversub == 0)
+    hostload = int(args.netload)
     assert (hostload > 0)
 
     # Sanity checks

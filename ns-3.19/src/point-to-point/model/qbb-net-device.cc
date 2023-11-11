@@ -531,6 +531,7 @@ void QbbNetDevice::NewQp(Ptr<RdmaQueuePair> qp) {
 }
 void QbbNetDevice::ReassignedQp(Ptr<RdmaQueuePair> qp) { DequeueAndTransmit(); }
 void QbbNetDevice::TriggerTransmit(void) { DequeueAndTransmit(); }
+bool QbbNetDevice::GetPaused(uint32_t q) { return m_paused[q]; }
 
 void QbbNetDevice::SetQueue(Ptr<BEgressQueue> q) {
     NS_LOG_FUNCTION(this << q);

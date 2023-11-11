@@ -45,6 +45,10 @@ SwitchNode::SwitchNode() {
     m_mmu->m_congaRouting.SetSwitchSendCallback(MakeCallback(&SwitchNode::DoSwitchSend, this));
     m_mmu->m_congaRouting.SetSwitchSendToDevCallback(
         MakeCallback(&SwitchNode::SendToDevContinue, this));
+    // AdaptiveRouting's Callback for switch functions
+    m_mmu->m_adaptiveRouting.SetSwitchSendCallback(MakeCallback(&SwitchNode::DoSwitchSend, this));
+    m_mmu->m_adaptiveRouting.SetSwitchSendToDevCallback(
+        MakeCallback(&SwitchNode::SendToDevContinue, this));
     // ConWeave's Callback for switch functions
     m_mmu->m_conweaveRouting.SetSwitchSendCallback(MakeCallback(&SwitchNode::DoSwitchSend, this));
     m_mmu->m_conweaveRouting.SetSwitchSendToDevCallback(
@@ -170,6 +174,12 @@ uint32_t SwitchNode::DoLbConWeave(Ptr<const Packet> p, const CustomHeader &ch,
                                   const std::vector<int> &nexthops) {
     return DoLbFlowECMP(p, ch, nexthops);  // flow ECMP (dummy)
 }
+
+/*------------------AdaptiveRouting Dummy ----------------*/
+uint32_t SwitchNode::DoLbAdaptive(Ptr<const Packet> p, const CustomHeader &ch,
+                                  const std::vector<int> &nexthops) {
+    return DoLbFlowECMP(p, ch, nexthops);  // flow ECMP (dummy)
+}
 /*----------------------------------*/
 
 void SwitchNode::CheckAndSendPfc(uint32_t inDev, uint32_t qIndex) {
@@ -230,6 +240,16 @@ void SwitchNode::SendToDev(Ptr<Packet> p, CustomHeader &ch) {
     // ConWeave
     if (Settings::lb_mode == 9) {
         m_mmu->m_conweaveRouting.RouteInput(p, ch);
+        return;
+    }
+
+    // Adaptive
+    if (Settings::lb_mode == 11) {
+        uint32_t usedEgressPortBytes[pCnt];
+        for(uint32_t i = 0; i < pCnt; i++){
+            usedEgressPortBytes[i] = m_mmu->GetUsedEgressPortBytes(i);
+        }
+        m_mmu->m_adaptiveRouting.RouteInput(p, ch, m_devices, usedEgressPortBytes, m_mmu->GetMmuBufferBytes());
         return;
     }
 
@@ -297,6 +317,8 @@ int SwitchNode::GetOutDev(Ptr<Packet> p, CustomHeader &ch) {
             return DoLbLetflow(p, ch, nexthops);
         case 9:
             return DoLbConWeave(p, ch, nexthops); /** DUMMY: Do ECMP */
+        case 11:
+            return DoLbAdaptive(p, ch, nexthops); /** DUMMY: Do ECMP */
         default:
             std::cout << "Unknown lb_mode(" << Settings::lb_mode << ")" << std::endl;
             assert(false);

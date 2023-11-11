@@ -10,6 +10,7 @@
 #include "ns3/conga-routing.h"
 #include "ns3/conweave-routing.h"
 #include "ns3/letflow-routing.h"
+#include "ns3/adaptive-routing.h"
 #include "ns3/settings.h"
 
 
@@ -61,6 +62,7 @@ class SwitchMmu : public Object {
     bool ShouldSendCN(uint32_t ifindex, uint32_t qIndex);
 
     uint32_t GetUsedBufferTotal();
+    uint32_t GetUsedEgressPortBytes(uint32_t port);
 
     void SetDynamicThreshold(bool value);
     bool GetDynamicThreshold(void) const { return m_dynamicth; }
@@ -116,6 +118,9 @@ class SwitchMmu : public Object {
     /*------------ ConWeave Objects-------------*/
     ConWeaveRouting m_conweaveRouting;
 
+    /*------------ Adaptive Objects-------------*/
+    AdaptiveRouting m_adaptiveRouting;
+
    private:
     bool m_PFCenabled;
 
@@ -138,13 +143,18 @@ class SwitchMmu : public Object {
 
     // ingress params
     uint32_t m_buffer_cell_limit_sp;  // ingress sp buffer threshold p.120
-    uint32_t
-        m_buffer_cell_limit_sp_shared;  // ingress sp buffer shared threshold, nonshare -> share
+    uint32_t m_buffer_cell_limit_sp_shared;  // ingress sp buffer shared threshold, nonshare -> share
+    // 交换机的入口（ingress）每个优先级组（PG，Priority Group）所保证的最小缓冲区容量
     uint32_t m_pg_min_cell;             // ingress pg guarantee
+    // 每个入口端口所保证的最小缓冲区容量
     uint32_t m_port_min_cell;           // ingress port guarantee
+    // 每个优先级组（PG，Priority Group）在共享缓冲区中的最大缓冲区容量限制
     uint32_t m_pg_shared_limit_cell;    // max buffer for an ingress pg
+    // 每个入口端口在共享缓冲区中的最大缓冲区容量限制
     uint32_t m_port_max_shared_cell;    // max buffer for an ingress port
+    // 每个优先级组（PG，Priority Group）的头部空间限制
     uint32_t m_pg_hdrm_limit[pCnt];     // ingress pg headroom
+    // 入口端口允许的最大数据包大小
     uint32_t m_port_max_pkt_size;       // ingress global headroom
     // still needs reset limits..
     uint32_t m_port_min_cell_off;  // PAUSE off threshold

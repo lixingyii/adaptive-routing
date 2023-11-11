@@ -1,129 +1,34 @@
 date,id,ccmode,lbmode,cwh_tx_expiry_time,cwh_extra_reply_deadline,cwh_path_pause_time,cwh_extra_voq_flush_time,cwh_default_voq_waiting_time,pfc,irn,has_win,var_win,topo,bw,cdf,load,time
-10/31/23,pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-10-31-10:38:57,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-10-31-10:38:57/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-10-31-10:38:57/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-10-31-10:38:57/config.txt'
 
-10/31/23,pfc_dcqcn_conga_all-reduce_direct_direct_8_16_2023-10-31-10:39:02,1,3,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_direct_8_16_2023-10-31-10:39:02/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_direct_8_16_2023-10-31-10:39:02/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_direct_8_16_2023-10-31-10:39:02/config.txt'
+11/11/23,pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-11-11-16:37:53,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-11-11-16:37:53/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-11-11-16:37:53/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-11-11-16:37:53/config.txt'
 
-10/31/23,pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-10-31-10:39:07,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-10-31-10:39:07/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-10-31-10:39:07/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-10-31-10:39:07/config.txt'
+11/11/23,pfc_dcqcn_conga_all-reduce_direct_direct_8_16_2023-11-11-16:37:58,1,3,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_direct_8_16_2023-11-11-16:37:58/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_direct_8_16_2023-11-11-16:37:58/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_direct_8_16_2023-11-11-16:37:58/config.txt'
 
-10/31/23,pfc_dcqcn_conweave_all-reduce_direct_direct_8_16_2023-10-31-10:39:12,1,9,300,4,16,16,200,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_direct_direct_8_16_2023-10-31-10:39:12/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_direct_direct_8_16_2023-10-31-10:39:12/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_direct_direct_8_16_2023-10-31-10:39:12/config.txt'
+11/11/23,pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-11-11-16:38:03,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-11-11-16:38:03/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-11-11-16:38:03/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-11-11-16:38:03/config.txt'
 
-10/31/23,irn_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-10-31-10:39:17,1,0,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-10-31-10:39:17/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-10-31-10:39:17/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_direct_direct_8_16_2023-10-31-10:39:17/config.txt'
+11/11/23,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2023-11-11-16:38:08,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2023-11-11-16:38:08/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2023-11-11-16:38:08/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2023-11-11-16:38:08/config.txt'
 
-10/31/23,irn_dcqcn_conga_all-reduce_direct_direct_8_16_2023-10-31-10:39:22,1,3,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_direct_direct_8_16_2023-10-31-10:39:22/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_direct_direct_8_16_2023-10-31-10:39:22/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_direct_direct_8_16_2023-10-31-10:39:22/config.txt'
+11/11/23,pfc_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-11-11-16:41:17,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,75,0.5,all-reduce,ring_ring,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-11-11-16:41:17/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-11-11-16:41:17/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-11-11-16:41:17/config.txt'
 
-10/31/23,irn_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-10-31-10:39:27,1,6,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-10-31-10:39:27/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-10-31-10:39:27/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_direct_direct_8_16_2023-10-31-10:39:27/config.txt'
+11/11/23,pfc_dcqcn_conga_all-reduce_ring_ring_8_16_2023-11-11-16:41:22,1,3,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,75,0.5,all-reduce,ring_ring,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_8_16_2023-11-11-16:41:22/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_8_16_2023-11-11-16:41:22/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_8_16_2023-11-11-16:41:22/config.txt'
 
-10/31/23,irn_dcqcn_conweave_all-reduce_direct_direct_8_16_2023-10-31-10:39:32,1,9,300,4,16,16,200,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_direct_direct_8_16_2023-10-31-10:39:32/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_direct_direct_8_16_2023-10-31-10:39:32/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_direct_direct_8_16_2023-10-31-10:39:32/config.txt'
+11/11/23,pfc_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-11-11-16:41:27,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,75,0.5,all-reduce,ring_ring,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-11-11-16:41:27/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-11-11-16:41:27/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-11-11-16:41:27/config.txt'
 
-10/31/23,pfc_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-10-31-16:03:08,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring_ring,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-10-31-16:03:08/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-10-31-16:03:08/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-10-31-16:03:08/config.txt'
-
-10/31/23,pfc_dcqcn_conga_all-reduce_ring_ring_8_16_2023-10-31-16:03:13,1,3,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring_ring,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_8_16_2023-10-31-16:03:13/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_8_16_2023-10-31-16:03:13/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_8_16_2023-10-31-16:03:13/config.txt'
-
-10/31/23,pfc_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-10-31-16:03:18,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring_ring,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-10-31-16:03:18/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-10-31-16:03:18/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-10-31-16:03:18/config.txt'
-
-10/31/23,pfc_dcqcn_conweave_all-reduce_ring_ring_8_16_2023-10-31-16:03:23,1,9,300,4,16,16,200,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring_ring,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_ring_ring_8_16_2023-10-31-16:03:23/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_ring_ring_8_16_2023-10-31-16:03:23/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_ring_ring_8_16_2023-10-31-16:03:23/config.txt'
-
-10/31/23,irn_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-10-31-16:03:28,1,0,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring_ring,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-10-31-16:03:28/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-10-31-16:03:28/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_ring_ring_8_16_2023-10-31-16:03:28/config.txt'
-
-10/31/23,irn_dcqcn_conga_all-reduce_ring_ring_8_16_2023-10-31-16:03:33,1,3,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring_ring,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_ring_ring_8_16_2023-10-31-16:03:33/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_ring_ring_8_16_2023-10-31-16:03:33/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_ring_ring_8_16_2023-10-31-16:03:33/config.txt'
-
-10/31/23,irn_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-10-31-16:03:39,1,6,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring_ring,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-10-31-16:03:39/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-10-31-16:03:39/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_ring_ring_8_16_2023-10-31-16:03:39/config.txt'
-
-10/31/23,irn_dcqcn_conweave_all-reduce_ring_ring_8_16_2023-10-31-16:03:44,1,9,300,4,16,16,200,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring_ring,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_ring_ring_8_16_2023-10-31-16:03:44/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_ring_ring_8_16_2023-10-31-16:03:44/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_ring_ring_8_16_2023-10-31-16:03:44/config.txt'
-
-10/31/23,pfc_dcqcn_fecmp_all-reduce_ring_128_2023-10-31-19:10:11,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_128_2023-10-31-19:10:11/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_128_2023-10-31-19:10:11/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_128_2023-10-31-19:10:11/config.txt'
-
-10/31/23,pfc_dcqcn_conga_all-reduce_ring_128_2023-10-31-19:10:16,1,3,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_128_2023-10-31-19:10:16/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_128_2023-10-31-19:10:16/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_128_2023-10-31-19:10:16/config.txt'
-
-10/31/23,pfc_dcqcn_letflow_all-reduce_ring_128_2023-10-31-19:10:21,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_128_2023-10-31-19:10:21/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_128_2023-10-31-19:10:21/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_128_2023-10-31-19:10:21/config.txt'
-
-10/31/23,pfc_dcqcn_conweave_all-reduce_ring_128_2023-10-31-19:10:26,1,9,300,4,16,16,200,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_ring_128_2023-10-31-19:10:26/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_ring_128_2023-10-31-19:10:26/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_ring_128_2023-10-31-19:10:26/config.txt'
-
-10/31/23,irn_dcqcn_fecmp_all-reduce_ring_128_2023-10-31-19:10:31,1,0,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_ring_128_2023-10-31-19:10:31/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_ring_128_2023-10-31-19:10:31/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_ring_128_2023-10-31-19:10:31/config.txt'
-
-10/31/23,irn_dcqcn_conga_all-reduce_ring_128_2023-10-31-19:10:36,1,3,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_ring_128_2023-10-31-19:10:36/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_ring_128_2023-10-31-19:10:36/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_ring_128_2023-10-31-19:10:36/config.txt'
-
-10/31/23,irn_dcqcn_letflow_all-reduce_ring_128_2023-10-31-19:10:41,1,6,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_ring_128_2023-10-31-19:10:41/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_ring_128_2023-10-31-19:10:41/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_ring_128_2023-10-31-19:10:41/config.txt'
-
-10/31/23,irn_dcqcn_conweave_all-reduce_ring_128_2023-10-31-19:10:46,1,9,300,4,16,16,200,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,ring,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_ring_128_2023-10-31-19:10:46/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_ring_128_2023-10-31-19:10:46/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_ring_128_2023-10-31-19:10:46/config.txt'
-
-11/01/23,pfc_dcqcn_fecmp_all-reduce_direct_128_2023-11-01-11:02:54,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_128_2023-11-01-11:02:54/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_128_2023-11-01-11:02:54/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_128_2023-11-01-11:02:54/config.txt'
-
-11/01/23,pfc_dcqcn_conga_all-reduce_direct_128_2023-11-01-11:02:59,1,3,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_128_2023-11-01-11:02:59/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_128_2023-11-01-11:02:59/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_direct_128_2023-11-01-11:02:59/config.txt'
-
-11/01/23,pfc_dcqcn_letflow_all-reduce_direct_128_2023-11-01-11:03:04,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_128_2023-11-01-11:03:04/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_128_2023-11-01-11:03:04/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_128_2023-11-01-11:03:04/config.txt'
-
-11/01/23,pfc_dcqcn_conweave_all-reduce_direct_128_2023-11-01-11:03:09,1,9,300,4,16,16,200,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_direct_128_2023-11-01-11:03:09/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_direct_128_2023-11-01-11:03:09/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_conweave_all-reduce_direct_128_2023-11-01-11:03:09/config.txt'
-
-11/01/23,irn_dcqcn_fecmp_all-reduce_direct_128_2023-11-01-11:03:14,1,0,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_direct_128_2023-11-01-11:03:14/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_direct_128_2023-11-01-11:03:14/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_fecmp_all-reduce_direct_128_2023-11-01-11:03:14/config.txt'
-
-11/01/23,irn_dcqcn_conga_all-reduce_direct_128_2023-11-01-11:03:19,1,3,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_direct_128_2023-11-01-11:03:19/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_direct_128_2023-11-01-11:03:19/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conga_all-reduce_direct_128_2023-11-01-11:03:19/config.txt'
-
-11/01/23,irn_dcqcn_letflow_all-reduce_direct_128_2023-11-01-11:03:24,1,6,1000,4,16,64,400,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_direct_128_2023-11-01-11:03:24/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_direct_128_2023-11-01-11:03:24/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_letflow_all-reduce_direct_128_2023-11-01-11:03:24/config.txt'
-
-11/01/23,irn_dcqcn_conweave_all-reduce_direct_128_2023-11-01-11:03:29,1,9,300,4,16,16,200,0,1,0,0,leaf_spine_128_100G_OS2,100,no_cdf,50,0.5,all-reduce,direct,128
-./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_direct_128_2023-11-01-11:03:29/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_direct_128_2023-11-01-11:03:29/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/irn_dcqcn_conweave_all-reduce_direct_128_2023-11-01-11:03:29/config.txt'
+11/11/23,pfc_dcqcn_adaptive_all-reduce_ring_ring_8_16_2023-11-11-16:41:32,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_100G_OS2,100,no_cdf,75,0.5,all-reduce,ring_ring,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_8_16_2023-11-11-16:41:32/config.txt' > /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_8_16_2023-11-11-16:41:32/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/ns-allinone-3.19/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_8_16_2023-11-11-16:41:32/config.txt'
 

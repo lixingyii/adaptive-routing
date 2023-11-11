@@ -191,7 +191,8 @@ bool SwitchMmu::CheckEgressAdmission(uint32_t port, uint32_t qIndex, uint32_t ps
     // PFC OFF Nothing
     bool threshold = true;
     /*
-    如果已使用的出口 SP 缓冲区大小 m_usedEgressSPBytes[GetEgressSP(port, qIndex)] 加上数据包大小 psize 超过了 SP 缓冲区的阈值 m_op_buffer_shared_limit_cell，
+    如果已使用的出口 SP 缓冲区大小 m_usedEgressSPBytes[GetEgressSP(port, qIndex)] 
+    加上数据包大小 psize 超过了 SP 缓冲区的阈值 m_op_buffer_shared_limit_cell，
     则表示数据包无法进入 SP 缓冲区
     */
     if (m_usedEgressSPBytes[GetEgressSP(port, qIndex)] + psize >
@@ -571,6 +572,8 @@ void SwitchMmu::SetBroadcomParams(
 }
 
 uint32_t SwitchMmu::GetUsedBufferTotal() { return m_usedTotalBytes; }
+
+uint32_t SwitchMmu::GetUsedEgressPortBytes(uint32_t port) { return m_usedEgressPortBytes[port]; }
 
 void SwitchMmu::SetDynamicThreshold(bool v) {
     m_dynamicth = v;

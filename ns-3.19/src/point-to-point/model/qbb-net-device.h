@@ -131,6 +131,7 @@ public:
    void NewQp(Ptr<RdmaQueuePair> qp);
    void ReassignedQp(Ptr<RdmaQueuePair> qp);
    void TriggerTransmit(void);
+   bool GetPaused(uint32_t q);
 
    bool IsQbbEnabled(void) { return m_qbbEnabled; }
 
