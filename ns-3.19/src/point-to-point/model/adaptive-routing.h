@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <limits>
 
 #include "ns3/address.h"
 #include "ns3/callback.h"

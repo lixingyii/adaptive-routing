@@ -16,7 +16,7 @@ TOPOLOGY="leaf_spine_128_100G_OS2" # topology
 NETLOAD="75" # network load 75%
 RUNTIME="0.5" # 0.5 second (traffic generation)
 ALGORITHM="all-reduce"
-IMPLEMENTATION="ring_ring"
+IMPLEMENTATION="direct_direct"
 PHYSICAL_DIMS="8_16"
 
 cecho "YELLOW" "\n----------------------------------"

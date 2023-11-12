@@ -23,6 +23,7 @@ lb_modes = {
     3: "conga",
     6: "letflow",
     9: "conweave",
+    11: "adaptive",
 }
 topo2bdp = {
     "leaf_spine_128_100G_OS2": 153000,  # 2-tier before 104000
@@ -249,7 +250,7 @@ def main():
 
         ccmode_order = ["dcqcn", "hpcc", "timely"]
         impl_order = ["direct", "ring", "direct_direct", "ring_ring"]
-        lbmode_order = ["fecmp", "conga", "letflow", "conweave"]
+        lbmode_order = ["fecmp", "conga", "letflow", "conweave", "adaptive"]
         if variable == 'lb_mode':
             for tgt_lbmode in lbmode_order:
                 for vv in v:
@@ -342,7 +343,7 @@ def main():
 
         ccmode_order = ["dcqcn", "hpcc", "timely"]
         impl_order = ["direct", "ring", "direct_direct", "ring_ring"]
-        lbmode_order = ["fecmp", "conga", "letflow", "conweave"]
+        lbmode_order = ["fecmp", "conga", "letflow", "conweave", "adaptive"]
         if variable == 'lb_mode':
             for tgt_lbmode in lbmode_order:
                 for vv in v:

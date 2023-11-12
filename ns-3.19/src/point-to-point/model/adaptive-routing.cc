@@ -260,12 +260,13 @@ uint32_t AdaptiveRouting::GetBestPath(uint32_t dstToRId, const std::vector<Ptr<N
     auto pathItr = m_adaptiveRoutingTable.find(dstToRId);
     assert(pathItr != m_adaptiveRoutingTable.end());
 
-    uint32_t minCongestion = UINT32_MAX;
+    double minCongestion = std::numeric_limits<double>::max();
     double gamma = 0.5;
 
     std::set<uint32_t>::iterator innerPathItr = pathItr->second.begin();
     uint32_t nSample = pathItr->second.size();
-    uint32_t qCnt = 128;
+    uint32_t qCnt = 8;
+    std::vector<uint32_t> candidatePaths;
     uint32_t candidatePath = 0;
     for(uint32_t i = 0; i < nSample; i++) {
         uint32_t pathId = *innerPathItr;
@@ -278,17 +279,20 @@ uint32_t AdaptiveRouting::GetBestPath(uint32_t dstToRId, const std::vector<Ptr<N
             }
         }
         uint32_t qlen = usedEgressPortBytes[outPort];
-        uint32_t currCongestion = gamma * (pfcCount / qCnt) + (1 - gamma) * (qlen / m_maxBufferBytes);
-        if (currCongestion < minCongestion){
+        double currCongestion = gamma * ((double)pfcCount / (double)qCnt) + (1 - gamma) * ((double)qlen / (double)m_maxBufferBytes);
+        // std::cout << "当前候选路径为" << pathId << "，" << "当前拥塞程度为" << currCongestion << std::endl;
+        if (currCongestion < minCongestion) {
             minCongestion = currCongestion;
-            candidatePath = pathId;
+            candidatePaths.clear();
+            candidatePaths.push_back(pathId);
+        }
+        else if (currCongestion == minCongestion) {
+            candidatePaths.push_back(pathId);
         }
         std::advance(innerPathItr, 1);
     }
-    if (candidatePath == 0) {
-        std::advance(innerPathItr, 0 - (rand() % pathItr->second.size()));
-        candidatePath = *innerPathItr;
-    }
+    candidatePath = candidatePaths[rand() % candidatePaths.size()];
+    // std::cout << "最佳路径为" << candidatePath << "，" << "最小拥塞程度为" << minCongestion << std::endl;
     return candidatePath;
 }
 
