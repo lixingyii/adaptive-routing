@@ -426,9 +426,9 @@ void letflow_history_print() {
  * @brief AdaptiveRouting timeout number recording
  */
 void adaptive_history_print() {
-    std::cout << "\n------------AdaptiveRouting History---------------" << std::endl;
-    std::cout << "Number of flowlet's timeout:" << AdaptiveRouting::nFlowletTimeout
-              << "\nLetflow's timeout: " << adaptive_flowletTimeout << std::endl;
+    // std::cout << "\n------------AdaptiveRouting History---------------" << std::endl;
+    // std::cout << "Number of flowlet's timeout:" << AdaptiveRouting::nFlowletTimeout
+    //           << "\nLetflow's timeout: " << adaptive_flowletTimeout << std::endl;
 }
 
 /**
