@@ -72,6 +72,8 @@ Time letflow_agingTime = MilliSeconds(2);  // just to clear the unused map entri
 Time adaptive_flowletTimeout = MicroSeconds(100);  // 100us
 Time adaptive_agingTime = MilliSeconds(2);  // just to clear the unused map entries for simul speed
 
+uint64_t utl_bw = 0;
+
 // Conweave params
 // θreply，Continuous RTT monitoring中RTT_REPLY的超时值
 Time conweave_extraReplyDeadline = MicroSeconds(4);       // additional term to reply deadline
@@ -521,10 +523,10 @@ void qp_finish(FILE *fout, Ptr<RdmaQueuePair> q) {
             standalone_fct);
 
     // for debugging
-    NS_LOG_DEBUG("%u %u %u %u %lu %lu %lu %lu\n" %
-                 (Settings::ip_to_node_id(q->sip), Settings::ip_to_node_id(q->dip), q->sport,
-                  q->dport, q->m_size, q->startTime.GetTimeStep(),
-                  (Simulator::Now() - q->startTime).GetTimeStep(), standalone_fct));
+    // NS_LOG_DEBUG("%u %u %u %u %lu %lu %lu %lu\n" %
+    //              (Settings::ip_to_node_id(q->sip), Settings::ip_to_node_id(q->dip), q->sport,
+    //               q->dport, q->m_size, q->startTime.GetTimeStep(),
+    //               (Simulator::Now() - q->startTime).GetTimeStep(), standalone_fct));
     Settings::cnt_finished_flows++;
     fflush(fout);
 }
@@ -1313,6 +1315,7 @@ int main(int argc, char *argv[]) {
                 ->GetDelay()
                 .GetTimeStep();
         nbr2if[snode][dnode].bw = DynamicCast<QbbNetDevice>(d.Get(0))->GetDataRate().GetBitRate();
+        utl_bw = nbr2if[snode][dnode].bw; // 网络链路带宽
         nbr2if[dnode][snode].idx = DynamicCast<QbbNetDevice>(d.Get(1))->GetIfIndex();
         nbr2if[dnode][snode].up = true;
         nbr2if[dnode][snode].delay =
@@ -1385,8 +1388,8 @@ int main(int argc, char *argv[]) {
             sw->m_mmu->ConfigBufferSize(buffer_size * 1024 *  // 9MB
                                         1024);  // default 0, specify in run.py!!
             sw->m_mmu->node_id = sw->GetId();
-            NS_LOG_INFO("Node %u : Broadcom switch (%u ports / %gMB MMU)\n" %
-                        (i, sw->GetNDevices() - 1, sw->m_mmu->GetMmuBufferBytes() / 1000000.));
+            // NS_LOG_INFO("Node %u : Broadcom switch (%u ports / %gMB MMU)\n" %
+            //             (i, sw->GetNDevices() - 1, sw->m_mmu->GetMmuBufferBytes() / 1000000.0));
         }
     }
 
@@ -1442,7 +1445,7 @@ int main(int argc, char *argv[]) {
 
     // manually type BDP
     std::map<std::string, uint32_t> topo2bdpMap;
-    topo2bdpMap[std::string("leaf_spine_128_100G_OS2")] = 156000;  // 以前是104000 RTT=8320 RTT*12.5
+    topo2bdpMap[std::string("leaf_spine_128_400G_OS2")] = 606000;  // 以前是104000 RTT=8320 RTT*12.5
     topo2bdpMap[std::string("fat_k8_100G_OS2")] = 156000;      // RTT=12480 --> all 100G links
 
     // topology_file
@@ -1785,7 +1788,7 @@ int main(int argc, char *argv[]) {
             if (i->first->GetNodeType() == 1) {
                 Ptr<Node> node = i->first;
                 Ptr<SwitchNode> sw = DynamicCast<SwitchNode>(node);  // switch
-                NS_LOG_INFO("Switch Info - ID:%u, ToR:%d\n" % (sw->GetId(), sw->m_isToR));
+                // NS_LOG_INFO("Switch Info - ID:%u, ToR:%d\n" % (sw->GetId(), sw->m_isToR));
                 if (lb_mode == 3) {
                     sw->m_mmu->m_congaRouting.SetConstants(conga_dreTime, conga_agingTime,
                                                            conga_flowletTimeout, conga_quantizeBit,
@@ -1809,6 +1812,7 @@ int main(int argc, char *argv[]) {
                                                             adaptive_flowletTimeout);
                     sw->m_mmu->m_adaptiveRouting.SetSwitchInfo(sw->m_isToR, sw->GetId());
                 }
+                sw->m_mmu->m_bw = utl_bw;
             }
         }
 

@@ -1146,7 +1146,7 @@ void ConWeaveRouting::RouteInput(Ptr<Packet> p, CustomHeader &ch) {
 void ConWeaveRouting::SetConstants(Time extraReplyDeadline, Time extraVOQFlushTime,
                                    Time txExpiryTime, Time defaultVOQWaitingTime,
                                    Time pathPauseTime, bool pathAwareRerouting) {
-    NS_LOG_FUNCTION("Setup new parameters at sw" << m_switch_id);
+    // sNS_LOG_FUNCTION("Setup new parameters at sw" << m_switch_id);
     m_extraReplyDeadline = extraReplyDeadline;
     m_extraVOQFlushTime = extraVOQFlushTime;
     m_txExpiryTime = txExpiryTime;

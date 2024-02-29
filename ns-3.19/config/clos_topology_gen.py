@@ -1,6 +1,6 @@
 n_spine = 16
 n_pod = 16
-link_rate = 100  # Gbps
+link_rate = 400  # Gbps
 link_latency = 1000  # ns
 over_subscript = 2
 

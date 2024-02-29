@@ -14,6 +14,7 @@
 #include "ns3/random-variable.h"
 #include "ns3/simulator.h"
 #include "ns3/uinteger.h"
+#include "ns3/event-id.h"
 
 NS_LOG_COMPONENT_DEFINE("SwitchMmu");
 namespace ns3 {
@@ -58,7 +59,9 @@ SwitchMmu::SwitchMmu(void) {
     m_uniform_random_var.SetStream(0);
 
     // dynamic threshold
-    m_dynamicth = false;
+    m_dynamicth = true;
+
+    m_utlMeasureTime = MicroSeconds(20);
 
     InitSwitch();
 }
@@ -130,6 +133,14 @@ void SwitchMmu::InitSwitch(void) {
     m_log_start = 2.1;
     m_log_end = 2.2;
     m_log_step = 0.00001;
+
+    // 启动 utlMeasure 事件调度器
+    if (!m_utlMeasureEvent.IsRunning()) {
+        // std::cout << "开始测量实时链路利用率" << std::endl;
+        // NS_LOG_FUNCTION("Switch mmu restarts utl meature event scheduling:" << m_switch_id << now);
+        m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
+    }
+
 }
 
 // 用于检查数据包是否可以被接受并入队到交换机的入口缓冲区
@@ -147,9 +158,9 @@ bool SwitchMmu::CheckIngressAdmission(uint32_t port, uint32_t qIndex, uint32_t p
     // 如果缓冲区没有满，方法继续检查数据包是否满足最小保证要求。
     // 这是通过比较已使用的端口级别和队列级别缓冲区大小与最小保证参数进行的
     /*
-    如果数据包大小 psize 加上已使用的队列级别缓冲区大小 m_usedIngressPGBytes[port][qIndex] 超过了队列的最小保证 m_pg_min_cell，
-    或者数据包大小与已使用的端口级别缓冲区大小 m_usedIngressPortBytes[port] 超过了端口的最小保证 m_port_min_cell，
-    则表示数据包将使用共享缓冲区
+    如果数据包大小 psize 加上已使用的队列级别guaranteed缓冲区大小超过了队列级别的PFC预留门限大小m_pg_min_cell，
+    并且数据包大小与已使用的端口级别guaranteed缓冲区大小超过了端口级别的PFC预留门限大小m_port_min_cell，
+    则表示数据包将使用share缓冲区
     */
     if (m_usedIngressPGBytes[port][qIndex] + psize > m_pg_min_cell &&
         m_usedIngressPortBytes[port] + psize >
@@ -157,7 +168,7 @@ bool SwitchMmu::CheckIngressAdmission(uint32_t port, uint32_t qIndex, uint32_t p
     {
         /*
         在使用共享缓冲区之前，
-        方法会检查是否已使用的入口 SP 缓冲区大小 m_usedIngressSPBytes[GetIngressSP(port, qIndex)] 是否超过了入口 SP 缓冲区的阈值 m_buffer_cell_limit_sp。
+        方法会检查是否已使用的入口 SP 缓冲区大小 m_usedIngressSPBytes[GetIngressSP(port, qIndex)] 是否超过了反压帧触发门限 m_buffer_cell_limit_sp。
         如果超过了这个阈值，表示头部空间已经被使用
         */
         if (m_usedIngressSPBytes[GetIngressSP(port, qIndex)] >
@@ -192,7 +203,7 @@ bool SwitchMmu::CheckEgressAdmission(uint32_t port, uint32_t qIndex, uint32_t ps
     bool threshold = true;
     /*
     如果已使用的出口 SP 缓冲区大小 m_usedEgressSPBytes[GetEgressSP(port, qIndex)] 
-    加上数据包大小 psize 超过了 SP 缓冲区的阈值 m_op_buffer_shared_limit_cell，
+    加上数据包大小 psize 超过了 反压帧触发门限 m_op_buffer_shared_limit_cell，
     则表示数据包无法进入 SP 缓冲区
     */
     if (m_usedEgressSPBytes[GetEgressSP(port, qIndex)] + psize >
@@ -364,6 +375,14 @@ void SwitchMmu::RemoveFromIngressAdmission(uint32_t port, uint32_t qIndex, uint3
 
 // 用于从出口缓冲区中移除数据包并更新相应的缓冲区使用情况
 void SwitchMmu::RemoveFromEgressAdmission(uint32_t port, uint32_t qIndex, uint32_t psize) {
+
+    // 启动 utlMeasure 事件调度器
+    if (!m_utlMeasureEvent.IsRunning()) {
+        // std::cout << "开始测量实时链路利用率" << std::endl;
+        // NS_LOG_FUNCTION("Switch mmu restarts utl meature event scheduling:" << m_switch_id << now);
+        m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
+    }
+
     // 检查数据包是否已经在队列级保证缓冲区 q_min_cell 中。
     // 如果数据包在 q_min_cell 中，那么它会从该队列级缓冲区中减去 psize 的大小，以确保不会超过保证限制
     if (m_usedEgressQMinBytes[port][qIndex] < m_q_min_cell)  // guaranteed
@@ -373,6 +392,8 @@ void SwitchMmu::RemoveFromEgressAdmission(uint32_t port, uint32_t qIndex, uint32
         }
         m_usedEgressQMinBytes[port][qIndex] -= psize;
         m_usedEgressPortBytes[port] -= psize;
+        m_currOutPortBytes[port] += psize;  // 统计当前端口在当前测量周期中发送的字节数
+        // std::cout << "当前端口" << port << "发送的数据量为" << m_currOutPortBytes[port] << std::endl;
         return;
     } else {
         /*
@@ -396,6 +417,8 @@ void SwitchMmu::RemoveFromEgressAdmission(uint32_t port, uint32_t qIndex, uint32
                 std::cerr << "STOP overflow\n";
             }
             m_usedEgressPortBytes[port] -= psize;
+            m_currOutPortBytes[port] += psize;
+            // std::cout << "当前端口" << port << "发送的数据量为" << m_currOutPortBytes[port] << std::endl;
 
         } 
         // 数据包只是从 q_shared_bytes 中使用了空间
@@ -410,6 +433,8 @@ void SwitchMmu::RemoveFromEgressAdmission(uint32_t port, uint32_t qIndex, uint32
             m_usedEgressQSharedBytes[port][qIndex] -= psize;
             m_usedEgressPortBytes[port] -= psize;
             m_usedEgressSPBytes[GetEgressSP(port, qIndex)] -= psize;
+            m_currOutPortBytes[port] += psize;
+            // std::cout << "当前端口" << port << "发送的数据量为" << m_currOutPortBytes[port] << std::endl;
         }
         return;
     }
@@ -610,6 +635,30 @@ void SwitchMmu::ConfigBufferSize(uint32_t size) {
     // if size == 0, buffer size will be automatically decided
     m_staticMaxBufferBytes = size;
     InitSwitch();
+}
+
+void SwitchMmu::UtlMeasureEvent() {
+    /**
+     * @brief This function is just to keep the flowlet table small as possible, to reduce memory overhead.
+     */
+    NS_LOG_FUNCTION(Simulator::Now());
+    // std::cout << Simulator::Now() << std::endl;
+    
+    for (uint32_t i = 0; i < pCnt; i++)  // port 0 is not used
+    {
+        // std::cout << "当前端口" << i << "在该测量周期内发送数据量为" << m_currOutPortBytes[i] << std::endl;
+        // std::cout << "当前端口" << i << "在该测量周期内链路利用率为" << link_utl[i] << std::endl;
+        // if (i == 0) {
+        //     std::cout << "带宽为" << m_bw << std::endl;
+        //     std::cout << "测量周期为" << m_utlMeasureTime.GetNanoSeconds() << std::endl;
+        //     std::cout << "链路容量" << m_bw * m_utlMeasureTime.GetNanoSeconds() << std::endl;
+        // }
+        link_utl[i] = (m_currOutPortBytes[i] * 10e9) / (m_bw * m_utlMeasureTime.GetNanoSeconds());
+        m_currOutPortBytes[i] = 0;
+    }
+
+    // 更新 UtlMeasure 事件，调度下一次 UtlMeasureEvent
+    m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
 }
 
 }  // namespace ns3

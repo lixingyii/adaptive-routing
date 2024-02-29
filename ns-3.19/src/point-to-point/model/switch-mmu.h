@@ -13,6 +13,10 @@
 #include "ns3/adaptive-routing.h"
 #include "ns3/settings.h"
 
+#include "ns3/event-id.h"
+#include "ns3/simulator.h"
+#include "ns3/object.h"
+
 
 namespace ns3 {
 
@@ -121,6 +125,11 @@ class SwitchMmu : public Object {
     /*------------ Adaptive Objects-------------*/
     AdaptiveRouting m_adaptiveRouting;
 
+    EventId m_utlMeasureEvent;
+    uint64_t m_bw;
+    double link_utl[pCnt];  // 交换机每个端口当前的链路利用率
+    void UtlMeasureEvent();
+
    private:
     bool m_PFCenabled;
 
@@ -140,6 +149,8 @@ class SwitchMmu : public Object {
     uint32_t m_usedEgressQSharedBytes[pCnt][qCnt];
     uint32_t m_usedEgressPortBytes[pCnt];
     uint32_t m_usedEgressSPBytes[4];
+
+    uint32_t m_currOutPortBytes[pCnt];  // 在当前测量周期内发送的字节数
 
     // ingress params
     uint32_t m_buffer_cell_limit_sp;  // ingress sp buffer threshold p.120
@@ -180,6 +191,8 @@ class SwitchMmu : public Object {
     double m_log_step;
 
     UniformRandomVariable m_uniform_random_var;
+
+    Time m_utlMeasureTime;
 };
 
 } /* namespace ns3 */

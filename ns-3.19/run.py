@@ -111,7 +111,7 @@ lb_modes = {
 }
 
 topo2bdp = {
-    "leaf_spine_128_100G_OS2": 156000,  # 2-tier -> all 100Gbps before 104000
+    "leaf_spine_128_400G_OS2": 156000,  # 2-tier -> all 100Gbps before 104000
     "fat_k8_100G_OS2": 156000,  # 3-tier -> all 100Gbps
 }
 
@@ -141,9 +141,9 @@ def main():
     parser.add_argument('--netload', dest='netload', action='store', type=int,
                         default=40, help="Network load at NIC to generate traffic (default: 40.0)")
     parser.add_argument('--bw', dest="bw", action='store',
-                        default='100', help="the NIC bandwidth (Gbps) (default: 100)")
+                        default='400', help="the NIC bandwidth (Gbps) (default: 400)")
     parser.add_argument('--topo', dest='topo', action='store',
-                        default='leaf_spine_128_100G', help="the name of the topology file (default: leaf_spine_128_100G_OS2)")
+                        default='leaf_spine_128_400G', help="the name of the topology file (default: leaf_spine_128_400G_OS2)")
     # parser.add_argument('--cdf', dest='cdf', action='store',
     #                     default='AliStorage2019', help="the name of the cdf file (default: AliStorage2019)")
     parser.add_argument('--enforce_win', dest='enforce_win', action='store',
@@ -314,6 +314,8 @@ def main():
             if (i > n_link):
                 break
             parsed = line.split(" ")
+            # print(parsed)
+            # print(bw)
             if len(parsed) > 2 and (int(parsed[0]) < n_host or int(parsed[1]) < n_host):
                 assert (int(parsed[2].replace("Gbps", "")) == int(bw))
     print("All NIC bandwidth is {bw}Gbps".format(bw=bw))
