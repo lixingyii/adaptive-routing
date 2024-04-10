@@ -8,11 +8,28 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <queue> 
+#include <vector>
+#include <utility>
 
 #include "qbb-net-device.h"
 #include "rdma-queue-pair.h"
+#include "ns3/assert.h"
+
+#define PER_PACKET_NIC 1
 
 namespace ns3 {
+
+struct cmp{
+    bool operator()(std::pair<Ptr<Packet>, CustomHeader> pkt1, std::pair<Ptr<Packet>, CustomHeader> pkt2){  // 序列号升序
+        // 创建一个自定义头部对象 ch，其中包含 L2、L3、L4 的标识，用于表示数据包的层次结构
+        // CustomHeader ch1(CustomHeader::L2_Header | CustomHeader::L3_Header | CustomHeader::L4_Header);
+        // pkt1->PeekHeader(ch1);  // 将数据包的头部信息读取到自定义头部对象 ch 中
+        // CustomHeader ch2(CustomHeader::L2_Header | CustomHeader::L3_Header | CustomHeader::L4_Header);
+        // pkt2->PeekHeader(ch2);
+        return pkt1.second.udp.seq > pkt2.second.udp.seq; 
+    }
+};
 
 struct RdmaInterfaceMgr {
     Ptr<QbbNetDevice> dev;
@@ -186,6 +203,14 @@ class RdmaHw : public Object {
     Time m_irn_rtoLow;
     Time m_irn_rtoHigh;
     uint32_t m_irn_bdp;
+
+#if PER_PACKET_NIC
+    std::map<uint64_t, std::pair<Time, std::priority_queue<std::pair<Ptr<Packet>, CustomHeader>, std::vector<std::pair<Ptr<Packet>, CustomHeader> >, cmp> > > m_pkt_buffer;  // rxKey -> buffer
+
+    Time m_agingTime;
+    EventId m_agingEvent;
+    void AgingEvent();
+#endif
 };
 
 } /* namespace ns3 */

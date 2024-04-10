@@ -1,38 +1,262 @@
 date,id,ccmode,lbmode,cwh_tx_expiry_time,cwh_extra_reply_deadline,cwh_path_pause_time,cwh_extra_voq_flush_time,cwh_default_voq_waiting_time,pfc,irn,has_win,var_win,topo,bw,cdf,load,time
 
-02/29/24,pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2024-02-29-13:07:52,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2024-02-29-13:07:52/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2024-02-29-13:07:52/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2024-02-29-13:07:52/config.txt'
+03/01/24,pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2024-03-01-11:26:07,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2024-03-01-11:26:07/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2024-03-01-11:26:07/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_direct_direct_8_16_2024-03-01-11:26:07/config.txt'
 
-02/29/24,pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:07:57,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:07:57/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:07:57/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:07:57/config.txt'
+03/01/24,pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-03-01-11:26:12,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-03-01-11:26:12/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-03-01-11:26:12/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-03-01-11:26:12/config.txt'
 
-02/29/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:08:02,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:08:02/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:08:02/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:08:02/config.txt'
+03/01/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-01-11:26:17,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-01-11:26:17/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-01-11:26:17/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-01-11:26:17/config.txt'
 
-02/29/24,pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:16:30,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:16:30/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:16:30/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:16:30/config.txt'
+03/03/24,pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-03-03-12:39:40,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-03-03-12:39:40/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-03-03-12:39:40/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-03-03-12:39:40/config.txt'
 
-02/29/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:16:35,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:16:35/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:16:35/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:16:35/config.txt'
+03/03/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-12:39:44,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-12:39:44/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-12:39:44/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-12:39:44/config.txt'
 
-02/29/24,pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:17:44,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:17:44/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:17:44/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:17:44/config.txt'
+03/03/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-20:33:22,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-20:33:22/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-20:33:22/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-20:33:22/config.txt'
 
-02/29/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:17:49,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:17:49/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:17:49/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:17:49/config.txt'
+03/03/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-21:52:55,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-21:52:55/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-21:52:55/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-03-21:52:55/config.txt'
 
-02/29/24,pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:20:01,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:20:01/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:20:01/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_direct_direct_8_16_2024-02-29-13:20:01/config.txt'
+03/05/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-05-15:28:55,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,direct_direct,8_16
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-05-15:28:55/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-05-15:28:55/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-03-05-15:28:55/config.txt'
 
-02/29/24,pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:20:06,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.7,all-reduce,direct_direct,8_16
-./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:20:06/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:20:06/config.log 2>&1
-./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_direct_direct_8_16_2024-02-29-13:20:06/config.txt'
+03/05/24,pfc_dcqcn_adaptive_all-reduce_ring_128_2024-03-05-15:52:19,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_128_2024-03-05-15:52:19/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_128_2024-03-05-15:52:19/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_128_2024-03-05-15:52:19/config.txt'
+
+03/05/24,pfc_dcqcn_fecmp_all-reduce_ring_128_2024-03-05-18:47:37,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_128_2024-03-05-18:47:37/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_128_2024-03-05-18:47:37/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_128_2024-03-05-18:47:37/config.txt'
+
+03/05/24,pfc_dcqcn_letflow_all-reduce_ring_128_2024-03-05-18:47:42,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_128_2024-03-05-18:47:42/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_128_2024-03-05-18:47:42/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_128_2024-03-05-18:47:42/config.txt'
+
+03/05/24,pfc_dcqcn_adaptive_all-reduce_ring_128_2024-03-05-18:47:47,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_128_2024-03-05-18:47:47/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_128_2024-03-05-18:47:47/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_128_2024-03-05-18:47:47/config.txt'
+
+03/05/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:04:32,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:04:32/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:04:32/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:04:32/config.txt'
+
+03/05/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:25:17,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:25:17/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:25:17/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:25:17/config.txt'
+
+03/05/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-20:25:22,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-20:25:22/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-20:25:22/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-20:25:22/config.txt'
+
+03/05/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-20:25:27,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-20:25:27/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-20:25:27/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-20:25:27/config.txt'
+
+03/05/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:29:51,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:29:51/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:29:51/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-20:29:51/config.txt'
+
+03/05/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-20:29:56,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-20:29:56/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-20:29:56/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-20:29:56/config.txt'
+
+03/05/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-20:30:01,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-20:30:01/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-20:30:01/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-20:30:01/config.txt'
+
+03/05/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-21:45:57,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-21:45:57/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-21:45:57/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-21:45:57/config.txt'
+
+03/05/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-21:46:02,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-21:46:02/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-21:46:02/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-21:46:02/config.txt'
+
+03/05/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-21:46:07,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-21:46:07/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-21:46:07/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-21:46:07/config.txt'
+
+03/05/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-23:36:04,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-23:36:04/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-23:36:04/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-23:36:04/config.txt'
+
+03/05/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-23:36:09,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-23:36:09/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-23:36:09/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-23:36:09/config.txt'
+
+03/05/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-23:36:14,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-23:36:14/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-23:36:14/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-23:36:14/config.txt'
+
+03/05/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-23:58:44,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-23:58:44/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-23:58:44/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-05-23:58:44/config.txt'
+
+03/05/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-23:58:49,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-23:58:49/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-23:58:49/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-05-23:58:49/config.txt'
+
+03/05/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-23:58:54,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-23:58:54/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-23:58:54/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-05-23:58:54/config.txt'
+
+03/06/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-11:07:34,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-11:07:34/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-11:07:34/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-11:07:34/config.txt'
+
+03/06/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-11:07:39,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-11:07:39/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-11:07:39/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-11:07:39/config.txt'
+
+03/06/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:07:44,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:07:44/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:07:44/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:07:44/config.txt'
+
+03/06/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:09:19,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:09:19/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:09:19/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:09:19/config.txt'
+
+03/06/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-11:26:22,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-11:26:22/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-11:26:22/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-11:26:22/config.txt'
+
+03/06/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-11:26:27,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-11:26:27/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-11:26:27/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-11:26:27/config.txt'
+
+03/06/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:26:32,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:26:32/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:26:32/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-11:26:32/config.txt'
+
+03/06/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-12:20:44,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-12:20:44/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-12:20:44/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-12:20:44/config.txt'
+
+03/06/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-16:47:18,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-16:47:18/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-16:47:18/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-16:47:18/config.txt'
+
+03/06/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-16:47:23,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-16:47:23/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-16:47:23/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-16:47:23/config.txt'
+
+03/06/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-16:47:28,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-16:47:28/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-16:47:28/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-16:47:28/config.txt'
+
+03/06/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-16:49:46,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-16:49:46/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-16:49:46/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-16:49:46/config.txt'
+
+03/06/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-16:49:51,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-16:49:51/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-16:49:51/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-16:49:51/config.txt'
+
+03/06/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-16:49:56,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-16:49:56/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-16:49:56/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-16:49:56/config.txt'
+
+03/06/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-21:10:50,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-21:10:50/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-21:10:50/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-06-21:10:50/config.txt'
+
+03/06/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-21:10:55,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-21:10:55/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-21:10:55/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-06-21:10:55/config.txt'
+
+03/06/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-21:11:00,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-21:11:00/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-21:11:00/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-06-21:11:00/config.txt'
+
+03/09/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-09-20:21:32,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-09-20:21:32/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-09-20:21:32/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-09-20:21:32/config.txt'
+
+03/09/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-09-20:21:37,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-09-20:21:37/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-09-20:21:37/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-09-20:21:37/config.txt'
+
+03/09/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-20:21:42,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-20:21:42/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-20:21:42/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-20:21:42/config.txt'
+
+03/09/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-20:23:03,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-20:23:03/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-20:23:03/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-20:23:03/config.txt'
+
+03/09/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-21:42:02,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-21:42:02/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-21:42:02/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-09-21:42:02/config.txt'
+
+03/10/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:21:23,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:21:23/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:21:23/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:21:23/config.txt'
+
+03/10/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-10-12:21:28,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-10-12:21:28/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-10-12:21:28/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-10-12:21:28/config.txt'
+
+03/10/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:21:33,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:21:33/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:21:33/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:21:33/config.txt'
+
+03/10/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:34:57,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:34:57/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:34:57/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:34:57/config.txt'
+
+03/10/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:36:07,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:36:07/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:36:07/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:36:07/config.txt'
+
+03/10/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:46:47,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:46:47/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:46:47/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:46:47/config.txt'
+
+03/10/24,pfc_dcqcn_conga_all-reduce_ring_ring_128_2024-03-10-12:46:52,1,3,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_128_2024-03-10-12:46:52/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_128_2024-03-10-12:46:52/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_conga_all-reduce_ring_ring_128_2024-03-10-12:46:52/config.txt'
+
+03/10/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:46:57,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:46:57/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:46:57/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:46:57/config.txt'
+
+03/10/24,pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:50:18,1,0,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:50:18/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:50:18/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_fecmp_all-reduce_ring_ring_128_2024-03-10-12:50:18/config.txt'
+
+03/10/24,pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-10-12:50:23,1,6,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-10-12:50:23/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-10-12:50:23/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_letflow_all-reduce_ring_ring_128_2024-03-10-12:50:23/config.txt'
+
+03/10/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:50:28,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:50:28/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:50:28/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-12:50:28/config.txt'
+
+03/10/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-13:37:27,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-13:37:27/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-13:37:27/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-10-13:37:27/config.txt'
+
+03/25/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-10:50:55,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-10:50:55/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-10:50:55/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-10:50:55/config.txt'
+
+03/25/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-10:52:36,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-10:52:36/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-10:52:36/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-10:52:36/config.txt'
+
+03/25/24,pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-11:07:43,1,11,1000,4,16,64,400,1,0,0,0,leaf_spine_128_400G_OS2,400,no_cdf,75,0.5,all-reduce,ring_ring,128
+./waf --run 'scratch/network-load-balance /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-11:07:43/config.txt' > /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-11:07:43/config.log 2>&1
+./waf --run 'scratch/network-load-balance' --command-template='gdb --args %s /home/xingyi/adaptive-routing/ns-3.19/mix/output/pfc_dcqcn_adaptive_all-reduce_ring_ring_128_2024-03-25-11:07:43/config.txt'
 

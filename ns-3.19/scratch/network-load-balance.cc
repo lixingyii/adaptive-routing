@@ -65,14 +65,14 @@ uint32_t conga_quantizeBit = 3;
 double conga_alpha = 0.2;
 
 // Letflow params
-Time letflow_flowletTimeout = MicroSeconds(100);  // 100us
+Time letflow_flowletTimeout = MicroSeconds(50);
 Time letflow_agingTime = MilliSeconds(2);  // just to clear the unused map entries for simul speed
 
 // AdaptiveRouting params
-Time adaptive_flowletTimeout = MicroSeconds(100);  // 100us
+Time adaptive_flowletTimeout = MicroSeconds(50);
 Time adaptive_agingTime = MilliSeconds(2);  // just to clear the unused map entries for simul speed
 
-uint64_t utl_bw = 0;
+// uint64_t utl_bw = 0;
 
 // Conweave params
 // θreply，Continuous RTT monitoring中RTT_REPLY的超时值
@@ -428,9 +428,9 @@ void letflow_history_print() {
  * @brief AdaptiveRouting timeout number recording
  */
 void adaptive_history_print() {
-    // std::cout << "\n------------AdaptiveRouting History---------------" << std::endl;
+    std::cout << "\n------------AdaptiveRouting History---------------" << std::endl;
     // std::cout << "Number of flowlet's timeout:" << AdaptiveRouting::nFlowletTimeout
-    //           << "\nLetflow's timeout: " << adaptive_flowletTimeout << std::endl;
+    //           << "\nAdaptive's timeout: " << adaptive_flowletTimeout << std::endl;
 }
 
 /**
@@ -1315,7 +1315,7 @@ int main(int argc, char *argv[]) {
                 ->GetDelay()
                 .GetTimeStep();
         nbr2if[snode][dnode].bw = DynamicCast<QbbNetDevice>(d.Get(0))->GetDataRate().GetBitRate();
-        utl_bw = nbr2if[snode][dnode].bw; // 网络链路带宽
+        // utl_bw = nbr2if[snode][dnode].bw; // 网络链路带宽
         nbr2if[dnode][snode].idx = DynamicCast<QbbNetDevice>(d.Get(1))->GetIfIndex();
         nbr2if[dnode][snode].up = true;
         nbr2if[dnode][snode].delay =
@@ -1597,10 +1597,6 @@ int main(int argc, char *argv[]) {
                 Settings::hostIp2SwitchId[hostIP] = sw->GetId();  // hostIP -> connected switch's ID
             }
         }
-
-        // Conga: m_congaFromLeafTable, m_congaToLeafTable, m_congaRoutingTable
-        // Letflow: m_letflowRoutingTable
-        // Conweave: m_ConWeaveRoutingTable, m_rxToRId2BaseRTT
         // AdaptiveRouting:m_adaptiveRoutingTable
         for (auto i = nextHop.begin(); i != nextHop.end(); i++) {  // every node
             if (i->first->GetNodeType() == 1) {                    // switch
@@ -1812,7 +1808,7 @@ int main(int argc, char *argv[]) {
                                                             adaptive_flowletTimeout);
                     sw->m_mmu->m_adaptiveRouting.SetSwitchInfo(sw->m_isToR, sw->GetId());
                 }
-                sw->m_mmu->m_bw = utl_bw;
+                // sw->m_mmu->m_bw = utl_bw;
             }
         }
 

@@ -249,7 +249,8 @@ void SwitchNode::SendToDev(Ptr<Packet> p, CustomHeader &ch) {
         for(uint32_t i = 0; i < pCnt; i++){
             usedEgressPortBytes[i] = m_mmu->GetUsedEgressPortBytes(i);
         }
-        m_mmu->m_adaptiveRouting.RouteInput(p, ch, m_mmu->link_utl, usedEgressPortBytes, m_mmu->GetMmuBufferBytes());
+        m_mmu->m_adaptiveRouting.RouteInput(p, ch, m_devices, usedEgressPortBytes,
+                                             m_mmu->GetMmuBufferBytes());
         return;
     }
 

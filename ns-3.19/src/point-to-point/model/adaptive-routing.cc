@@ -27,43 +27,21 @@ void AdaptiveTag::SetPathId(uint32_t pathId) { m_pathId = pathId; }
 uint32_t AdaptiveTag::GetPathId(void) const { return m_pathId; }
 void AdaptiveTag::SetHopCount(uint32_t hopCount) { m_hopCount = hopCount; }
 uint32_t AdaptiveTag::GetHopCount(void) const { return m_hopCount; }
-#if PER_PACKET
-void AdaptiveTag::SetSeq(uint64_t seq) { m_seq = seq; };
-uint64_t AdaptiveTag::GetSeq(void) const { return m_seq; };
-void AdaptiveTag::SetTimestampTx(uint64_t timestamp) { m_timestampTx = timestamp; };
-uint64_t AdaptiveTag::GetTimestampTx(void) const { return m_timestampTx; };
-#endif
 TypeId AdaptiveTag::GetInstanceTypeId(void) const { return GetTypeId(); }
 uint32_t AdaptiveTag::GetSerializedSize(void) const {
-#if PER_FLOWLET
     return sizeof(uint32_t) + sizeof(uint32_t);
-#else
-    return sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
-#endif
 }
 void AdaptiveTag::Serialize(TagBuffer i) const {
     i.WriteU32(m_pathId);
     i.WriteU32(m_hopCount);
-#if PER_PACKET
-    i.WriteU64(m_seq);
-    i.WriteU64(m_timestampTx);
-#endif
 }
 void AdaptiveTag::Deserialize(TagBuffer i) {
     m_pathId = i.ReadU32();
     m_hopCount = i.ReadU32();
-#if PER_PACKET
-    m_seq = i.ReadU64();
-    m_timestampTx = i.ReadU64();
-#endif
 }
 void AdaptiveTag::Print(std::ostream& os) const {
     os << "m_pathId=" << m_pathId;
     os << ", m_hopCount=" << m_hopCount;
-#if PER_PACKET
-    os << ", m_seq=" << m_seq;
-    os << ", m_timestampTx=" << m_timestampTx;
-#endif
 }
 
 /*----- Adaptive-Routing ------*/
@@ -75,10 +53,11 @@ AdaptiveRouting::AdaptiveRouting() {
     m_switch_id = (uint32_t)-1;
 
     // set constants
-    m_agingTime = Time(MilliSeconds(10));
+    
     m_defaultVOQWaitingTime = MicroSeconds(200);
     m_extraVOQFlushTime = MicroSeconds(8);        // for uncertainty
 #if PER_FLOWLET
+    m_agingTime = Time(MilliSeconds(10));
     m_flowletTimeout = Time(MicroSeconds(100));
 #endif
 }
@@ -121,7 +100,8 @@ void AdaptiveRouting::SetSwitchInfo(bool isToR, uint32_t switch_id) {
 }
 
 /* AdaptiveRouting's main function */
-void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, double link_utl[128], uint32_t usedEgressPortBytes[128], uint32_t m_maxBufferBytes) {
+// void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, double link_utl[128], uint32_t usedEgressPortBytes[128], uint32_t m_maxBufferBytes) {
+void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, const std::vector<Ptr<NetDevice> >& devices, uint32_t usedEgressPortBytes[128], uint32_t m_maxBufferBytes) {
     // Packet 到达时间
     Time now = Simulator::Now();
 
@@ -132,11 +112,13 @@ void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, double link_utl
     }
     assert(ch.l3Prot == 0x11 && "Only supports UDP data packets");
 
+#if PER_FLOWLET
     // 启动 aging 事件调度器
     if (!m_agingEvent.IsRunning()) {
         NS_LOG_FUNCTION("Adaptive routing restarts aging event scheduling:" << m_switch_id << now);
         m_agingEvent = Simulator::Schedule(m_agingTime, &AdaptiveRouting::AgingEvent, this);
     }
+#endif
 
     // 获取 srcToRId, dstToRId
     assert(Settings::hostIp2SwitchId.find(ch.sip) != Settings::hostIp2SwitchId.end());
@@ -206,8 +188,8 @@ void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, double link_utl
                 else {
                     // 如果 flowlet 已存在但已超时，
                     // 选择新的路径，并更新 flowlet 信息、增加数据包计数和 adaptiveTag
-                    selectedPath = GetBestPath(dstToRId, link_utl, usedEgressPortBytes, m_maxBufferBytes);
-                    std::cout<<"1"<<std::endl;
+                    selectedPath = GetBestPath(dstToRId, devices, usedEgressPortBytes, m_maxBufferBytes);
+                    // std::cout<<"1"<<std::endl;
                     AdaptiveRouting::nFlowletTimeout++;
 
                     // 更新 flowlet 信息
@@ -235,7 +217,7 @@ void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, double link_utl
             else {
                 // 如果 flowlet 不存在，
                 // 则创建新的 flowlet 、更新 adaptiveTag 和出端口信息，最后返回相应的出端口
-                selectedPath = GetBestPath(dstToRId, link_utl, usedEgressPortBytes, m_maxBufferBytes);
+                selectedPath = GetBestPath(dstToRId, devices, usedEgressPortBytes, m_maxBufferBytes);
                 struct Flowlet* newFlowlet = new Flowlet;
                 newFlowlet->_activeTime = now;
                 newFlowlet->_activatedTime = now;
@@ -291,223 +273,81 @@ void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, double link_utl
         // std::cout<<"非ToR发送完成"<<std::endl;
         return;
     }
-// #else
-//     if (m_isToR) {
-//         if (!found) {  // 发送端
-//             // std::cout << "当前交换机id：" << m_switch_id << std::endl;
-//             auto txEntry = m_adaptiveTxTable.find(qpkey);
-//             uint32_t selectedPath;
+#else
+    if (m_isToR) {
+        if (!found) {  // 发送端
+            uint32_t selectedPath = GetBestPath(dstToRId, devices, usedEgressPortBytes, m_maxBufferBytes);
 
-//             // 在adaptiveTxTable查找到这个flow的信息，说明这个packet不是这个flow的第一个packet
-//             if (txEntry != m_adaptiveTxTable.end()) {
-//                 // std::cout << "当前flowkey：" << qpkey << std::endl;
-//                 // std::cout << "在adaptiveTxTable查找到flow " << qpkey << " 的信息，说明这个packet不是第一个"<< std::endl;
-//                 // 为这个packet选择最优路径
-//                 selectedPath = GetBestPath(dstToRId, devices, usedEgressPortBytes, m_maxBufferBytes);
-//                 // std::cout << "为这个packet选择的最优路径：" << selectedPath << std::endl;
-//                 uint32_t outPort = GetOutPortFromPath(selectedPath, 0);  // 第0跳
-//                 (txEntry->second)._seq = (txEntry->second)._seq + 1;  // 序列号加1
-//                 // std::cout << "当前txEntry的seq：" << (txEntry->second)._seq << std::endl;
-//                 (txEntry->second)._activeTime = now.GetNanoSeconds();  // 更新这个flow表项的激活时间
-//                 // std::cout << "当前txEntry的activeTime：" << (txEntry->second)._activeTime << std::endl;
-//                 // 设置adaptiveTag的相关信息
-//                 adaptiveTag.SetSeq((txEntry->second)._seq);
-//                 adaptiveTag.SetTimestampTx((txEntry->second)._activeTime);
-//                 adaptiveTag.SetPathId(selectedPath);
-//                 adaptiveTag.SetHopCount(0);
+            uint32_t outPort = GetOutPortFromPath(selectedPath, 0);
+            adaptiveTag.SetPathId(selectedPath);
+            adaptiveTag.SetHopCount(0);
 
-//                 p->AddPacketTag(adaptiveTag);  // 将adaptiveTag插入此packet中
-//                 NS_LOG_FUNCTION("SenderToR"
-//                                 << m_switch_id
-//                                 << "Not first packet"
-//                                 << "Path/outPort" << selectedPath << outPort << now);
+            p->AddPacketTag(adaptiveTag);
+            NS_LOG_FUNCTION("SenderToR"
+                            << m_switch_id
+                            << "Flowlet does not exist"
+                            << "Path/outPort" << selectedPath << outPort << now);
+            DoSwitchSend(p, ch, GetOutPortFromPath(selectedPath, adaptiveTag.GetHopCount()), ch.udp.pg);
+            // std::cout<<"flowlet 不存在，ToR发送完成"<<std::endl;
+            return;
+        }
+        else {  // 接收端
+            // 如果是接收端，移除 adaptiveTag
+            p->RemovePacketTag(adaptiveTag);
+            NS_LOG_FUNCTION("ReceiverToR"
+                            << m_switch_id
+                            << "Path" << adaptiveTag.GetPathId() << now);
+            DoSwitchSendToDev(p, ch);
+            // std::cout<<"ToR接收端接收完成"<<std::endl;
+            return;
+        }
+    }
+    else {  // 非ToR交换机
+        // 检查是否找到 adaptiveTag
+        NS_ASSERT_MSG(found, "If not ToR (leaf), adaptiveTag should be found");
+        // 获取或更新 hopCount，然后通过 GetOutPortFromPath 函数计算出端口。
+        uint32_t hopCount = adaptiveTag.GetHopCount() + 1;
+        adaptiveTag.SetHopCount(hopCount);
 
-//                 DoSwitchSend(p, ch, outPort, ch.udp.pg);
-//                 // std::cout << std::endl;
-//                 return;
-//             }
-//             else {  // 在adaptiveTxTable没有查找到这个flow的信息，说明这个packet是这个flow的第一个packet
-//                 // 为这个packet选择最优路径
-//                 // std::cout << "当前flowkey：" << qpkey << std::endl;
-//                 // std::cout << "在adaptiveTxTable未查找到flow " << qpkey << " 的信息，说明这个packet是第一个"<< std::endl;
-//                 selectedPath = GetBestPath(dstToRId, devices, usedEgressPortBytes, m_maxBufferBytes);
-//                 // std::cout << "为这个packet选择的最优路径：" << selectedPath << std::endl;
-//                 // std::cout << "为这个flow建立新的表项" << selectedPath << std::endl;
-//                 uint32_t outPort = GetOutPortFromPath(selectedPath, 0);
-//                 adaptiveTxState newEntry;  // 为这个flow建立新的表项
-//                 newEntry._seq = 0;  // 第一个序列号为0
-//                 newEntry._activeTime = now.GetNanoSeconds();  // 更新激活时间
-//                 // std::cout << "当前txEntry的activeTime：" << (txEntry->second)._activeTime << std::endl;
-//                 m_adaptiveTxTable[qpkey] = newEntry;  // 将此表象加入到adaptiveTxTable
-
-//                 // 设置adaptiveTag的相关信息
-//                 adaptiveTag.SetPathId(selectedPath);
-//                 adaptiveTag.SetTimestampTx(newEntry._activeTime);
-//                 adaptiveTag.SetHopCount(0);
-//                 adaptiveTag.SetSeq(0);
-                
-//                 p->AddPacketTag(adaptiveTag);  // 将adaptiveTag插入此packet中
-//                 NS_LOG_FUNCTION("SenderToR"
-//                                 << m_switch_id
-//                                 << "Flowlet exists & Timeout"
-//                                 << "Path/outPort" << selectedPath << outPort << now);
-//                 DoSwitchSend(p, ch, outPort, ch.udp.pg);
-//                 // std::cout << std::endl;
-//                 return;
-//             }
-//         }
-//         else {  // 接收端
-//             auto rxEntry = m_adaptiveRxTable.find(qpkey);
-            
-//             // 在adaptiveRxTable查找到此flow的信息，说明此packet不是此flow的第一个packet
-//             if (rxEntry != m_adaptiveRxTable.end()) {
-//                 // std::cout << "当前flowkey：" << qpkey << std::endl;
-//                 // std::cout << "在adaptiveRxTable查找到flow " << qpkey << " 的信息，说明这个packet不是第一个"<< std::endl;
-//                 if ((rxEntry->second)._nextSeq == adaptiveTag.GetSeq()) {  // 如果此packet的序列号等于此flow期待的下一个序列号，说明此flow未乱序
-//                     // std::cout << "此packet的序列号 " << adaptiveTag.GetSeq() << "等于此flow期待的下一个序列号，说明此flow未乱序" << std::endl;
-//                     (rxEntry->second)._nextSeq++;  // 更新此flow期待的下一个序列号
-//                     (rxEntry->second)._timeInOrderAtTx = adaptiveTag.GetTimestampTx();  // 更新此flow未乱序的最后一个packet发送时间戳
-//                     // std::cout << "此flow未乱序的最后一个packet发送时间戳" << (rxEntry->second)._timeInOrderAtTx << std::endl;
-//                     (rxEntry->second)._activeTime = now.GetNanoSeconds();  // 更新此表项的激活时间
-//                     // std::cout << "当前rxEntry的activeTime：" << (rxEntry->second)._activeTime << std::endl;
-//                     if ((rxEntry->second)._reordering) {  // 如果此flow此刻处于乱序状态，说明此packet前面有乱序packet先到达
-//                         // std::cout << "此flow " << qpkey << "此刻处于乱序状态，说明此packet前面有乱序packet先到达" << std::endl;
-//                         (rxEntry->second)._tailTime = adaptiveTag.GetTimestampTx();  // 记录此按序packet的发送时间戳
-//                         (rxEntry->second)._timeExpectedToFlush = now.GetNanoSeconds() + 1;  // 立刻刷新缓冲区
-//                         (rxEntry->second)._timegapAtTx = (rxEntry->second)._tailTime - (rxEntry->second)._timeInOrderAtTx;  // 记录延误的时间差
-//                         // std::cout << "当前rxEntry的_timegapAtTx " << (rxEntry->second)._timegapAtTx << std::endl;
-
-//                         auto voq = m_voqMap.find(qpkey);  // 查找此flow的缓冲区
-//                         assert(voq != m_voqMap.end());
-//                         voq->second.Enqueue(adaptiveTag.GetSeq(), p);
-//                         // 立刻刷新缓冲区并刷新
-//                         // std::cout << "立刻刷新缓冲区并刷新 " << std::endl;
-//                         // std::cout << std::endl;
-//                         voq->second.RescheduleFlushImmediately();
-//                         return;
-//                     }
-//                     else {
-//                         // std::cout << "未乱序，当前packet的seq" << adaptiveTag.GetSeq() << std::endl << std::endl;
-//                         p->RemovePacketTag(adaptiveTag);
-//                         NS_LOG_FUNCTION("ReceiverToR"
-//                                         << m_switch_id
-//                                         << "Path" << adaptiveTag.GetPathId() << now);
-//                         DoSwitchSendToDev(p, ch);
-//                         return;
-//                     }
-//                 }
-//                 else {  // 如果此packet的序列号不等于此flow期待的下一个序列号，说明此flow已乱序
-//                     // std::cout << "当前flowkey：" << qpkey << std::endl;
-//                     // std::cout << "此packet的序列号 " << adaptiveTag.GetSeq() << "不等于此flow期待的下一个序列号" << (rxEntry->second)._nextSeq  << "，说明此flow乱序" << std::endl;
-//                     auto it = m_voqMap.find(qpkey);
-//                     AdaptiveVOQ &voq = m_voqMap[qpkey];
-//                     if (it == m_voqMap.end()) {  // 如果找不到对应的缓冲区，建立新的缓冲区
-//                         // std::cout << "找不到对应的缓冲区，建立新的缓冲区" << std::endl;
-//                         voq.Set(qpkey, ch.dip, NanoSeconds((rxEntry->second)._timeExpectedToFlush), m_extraVOQFlushTime, (rxEntry->second)._nextSeq);
-//                         voq.m_deleteCallback = MakeCallback(&AdaptiveRouting::DeleteVOQ, this);
-//                         voq.m_CallbackByVOQFlush = MakeCallback(&AdaptiveRouting::CallbackByVOQFlush, this);
-//                         voq.m_switchSendToDevCallback = MakeCallback(&AdaptiveRouting::DoSwitchSendToDev, this);
-//                         voq.m_updateSeqCallback = MakeCallback(&AdaptiveRouting::UpdateSeq, this);
-//                     }
-
-//                     // 标记此表项已乱序
-//                     // std::cout << "此表项已乱序" << std::endl;
-//                     (rxEntry->second)._reordering = true;
-//                     // std::cout << "将序列号为" << adaptiveTag.GetSeq() << "放入voq中" << std::endl << std::endl;
-//                     voq.Enqueue(adaptiveTag.GetSeq(), p);  // 将此packet放入缓冲区
-//                     return;
-//                 }
-//             }
-//             else{  // 在adaptiveRxTable查找不到此flow的信息，说明此packet是此flow的第一个packet
-//                 // std::cout << "当前flowkey：" << qpkey << std::endl;
-//                 // std::cout << "在adaptiveRxTable未查找到flow " << qpkey << " 的信息，说明这个packet是第一个"<< std::endl;
-//                 adaptiveRxState newEntry;  // 建立新表项
-//                 newEntry._timeInOrderAtTx = adaptiveTag.GetTimestampTx();  // 更新按序的最后一个packet的发送时间戳
-//                 newEntry._activeTime = now.GetNanoSeconds();  // 更新激活时间
-//                 newEntry._nextSeq = 0;
-//                 if (newEntry._nextSeq != adaptiveTag.GetSeq()) {  // 第一个packet就乱序，建立新的缓冲区，并将此packet存入缓冲区
-//                     AdaptiveVOQ &voq = m_voqMap[qpkey];
-//                     // std::cout << "找不到对应的缓冲区，建立新的缓冲区" << std::endl;
-//                     voq.Set(qpkey, ch.dip, NanoSeconds((rxEntry->second)._timeExpectedToFlush), m_extraVOQFlushTime, newEntry._nextSeq);
-//                     voq.m_deleteCallback = MakeCallback(&AdaptiveRouting::DeleteVOQ, this);
-//                     voq.m_CallbackByVOQFlush = MakeCallback(&AdaptiveRouting::CallbackByVOQFlush, this);
-//                     voq.m_switchSendToDevCallback = MakeCallback(&AdaptiveRouting::DoSwitchSendToDev, this);
-//                     voq.m_updateSeqCallback = MakeCallback(&AdaptiveRouting::UpdateSeq, this);
-
-//                     // 标记此表项已乱序
-//                     // std::cout << "此表项已乱序" << std::endl;
-//                     newEntry._reordering = true;
-//                     m_adaptiveRxTable[qpkey] = newEntry;
-//                     // std::cout << "将序列号为" << adaptiveTag.GetSeq() << "放入voq中" << std::endl << std::endl;
-//                     voq.Enqueue(adaptiveTag.GetSeq(), p);  // 将此packet放入缓冲区
-//                     return;
-//                 }
-//                 else {  // 第一个packet没有乱序，直接发送给终端
-//                     newEntry._nextSeq = adaptiveTag.GetSeq() + 1;
-//                     // std::cout << "新表项的nextseq " << newEntry._nextSeq << std::endl;
-//                     m_adaptiveRxTable[qpkey] = newEntry;
-//                     p->RemovePacketTag(adaptiveTag);
-//                     NS_LOG_FUNCTION("ReceiverToR"
-//                                     << m_switch_id
-//                                     << "Path" << adaptiveTag.GetPathId() << now);
-//                     DoSwitchSendToDev(p, ch);
-//                     return;
-//                 }
-//             }
-//         }
-//     }
-//     else {  // 非ToR交换机
-//         // 检查是否找到 adaptiveTag
-//         NS_ASSERT_MSG(found, "If not ToR (leaf), adaptiveTag should be found");
-//         // 获取或更新 hopCount，然后通过 GetOutPortFromPath 函数计算出端口。
-//         uint32_t hopCount = adaptiveTag.GetHopCount() + 1;
-//         adaptiveTag.SetHopCount(hopCount);
-
-//         // 获取出端口
-//         uint32_t outPort = GetOutPortFromPath(adaptiveTag.GetPathId(), hopCount);
+        // 获取出端口
+        uint32_t outPort = GetOutPortFromPath(adaptiveTag.GetPathId(), hopCount);
         
-//         // 重新序列化 adaptiveTag ，将其添加回数据包中，并返回相应的出端口。
-//         AdaptiveTag temp_tag;
-//         p->RemovePacketTag(temp_tag);
-//         p->AddPacketTag(adaptiveTag);
-//         NS_LOG_FUNCTION("Agg/CoreSw"
-//                         << m_switch_id
-//                         << "Path/outPort" << adaptiveTag.GetPathId() << outPort << now);
-//         DoSwitchSend(p, ch, outPort, ch.udp.pg);
-//         return;
-//     }
+        // 重新序列化 adaptiveTag ，将其添加回数据包中，并返回相应的出端口。
+        AdaptiveTag temp_tag;
+        p->RemovePacketTag(temp_tag);
+        p->AddPacketTag(adaptiveTag);
+        NS_LOG_FUNCTION("Agg/CoreSw"
+                        << m_switch_id
+                        << "Path/outPort" << adaptiveTag.GetPathId() << outPort << now);
+        DoSwitchSend(p, ch, outPort, ch.udp.pg);
+        return;
+    }
 
 #endif
     NS_ASSERT_MSG("false", "This should not be occured");
 }
 
-uint32_t AdaptiveRouting::GetBestPath(uint32_t dstToRId, double link_utl[128], uint32_t usedEgressPortBytes[128], uint32_t m_maxBufferBytes) {
+// uint32_t AdaptiveRouting::GetBestPath(uint32_t dstToRId, double link_utl[128], uint32_t usedEgressPortBytes[128], uint32_t m_maxBufferBytes) {
+uint32_t AdaptiveRouting::GetBestPath(uint32_t dstToRId, const std::vector<Ptr<NetDevice> >& devices, uint32_t usedEgressPortBytes[128], uint32_t m_maxBufferBytes) {
     // 通过目标 ToR 的 ID 在路径表中查找对应的路径集合
     auto pathItr = m_adaptiveRoutingTable.find(dstToRId);
     assert(pathItr != m_adaptiveRoutingTable.end());
 
     double minCongestion = std::numeric_limits<double>::max();
-    double gamma = 0.7;
+    double gamma = 0.5;
+    unsigned qIndex = 3;
 
     std::set<uint32_t>::iterator innerPathItr = pathItr->second.begin();
     uint32_t nSample = pathItr->second.size();
-    // uint32_t qCnt = 8;
     std::vector<uint32_t> candidatePaths;
     uint32_t candidatePath = 0;
     for(uint32_t i = 0; i < nSample; i++) {
         uint32_t pathId = *innerPathItr;
         auto outPort = GetOutPortFromPath(pathId, 0);
-        // Ptr<QbbNetDevice> device = DynamicCast<QbbNetDevice>(devices[outPort]);
-        // uint32_t pfcCount = 0;
-        // for(uint32_t j = 0; j < qCnt; j++){
-        //     if (device->GetPaused(j)) {
-        //         pfcCount++;
-        //     }
-        // }
+        Ptr<QbbNetDevice> device = DynamicCast<QbbNetDevice>(devices[outPort]);
+        double pause = device->GetPaused(qIndex) ? 1.0 : 0.0;
         uint32_t qlen = usedEgressPortBytes[outPort];
-        // std::cout << "当前端口" << outPort << "实时端口利用率为" << link_utl[outPort] << std::endl;
-        // double currCongestion = 1.0 / (1.0 + std::exp(-1.0 * (alpha * link_utl[outPort] - beta * ((double)qlen / (double)m_maxBufferBytes))));
-        double currCongestion = gamma * ((double)qlen / (double)m_maxBufferBytes) - (1 - gamma) * link_utl[outPort];
+        double currCongestion = gamma * pause + (1 - gamma) * ((double)qlen / (double)m_maxBufferBytes);
         // std::cout << "当前候选路径为" << pathId << "，" << "当前拥塞程度为" << currCongestion << std::endl;
         if (currCongestion < minCongestion) {
             minCongestion = currCongestion;
@@ -522,33 +362,6 @@ uint32_t AdaptiveRouting::GetBestPath(uint32_t dstToRId, double link_utl[128], u
     candidatePath = candidatePaths[rand() % candidatePaths.size()];
     // std::cout << "最佳路径为" << candidatePath << "，" << "最小拥塞程度为" << minCongestion << std::endl;
     return candidatePath;
-
-    // Two random choices
-    // auto candidatePathItr1 = pathItr->second.begin();
-    // std::advance(candidatePathItr1, rand() % pathItr->second.size());
-    // uint32_t pathId1 = *candidatePathItr1;
-    // auto outPort1 = GetOutPortFromPath(pathId1, 0);
-    // uint32_t qlen1 = usedEgressPortBytes[outPort1];
-    // double currCongestion1 = gamma * ((double)qlen1 / (double)m_maxBufferBytes) - (1 - gamma) * link_utl[outPort1];
-
-    // auto candidatePathItr2 = pathItr->second.begin();
-    // std::advance(candidatePathItr2, rand() % pathItr->second.size());
-    // uint32_t pathId2 = *candidatePathItr2;
-    // while (pathId1 == pathId2) {
-    //     candidatePathItr2 = pathItr->second.begin();
-    //     std::advance(candidatePathItr2, rand() % pathItr->second.size());
-    //     pathId2 = *candidatePathItr2;
-    // }
-    // auto outPort2 = GetOutPortFromPath(pathId2, 0);
-    // uint32_t qlen2 = usedEgressPortBytes[outPort2];
-    // double currCongestion2 = gamma * ((double)qlen2 / (double)m_maxBufferBytes) - (1 - gamma) * link_utl[outPort2];
-
-    // if (currCongestion1 <= currCongestion2) {
-    //     return pathId1;
-    // }
-    // else {
-    //     return pathId2;
-    // }
 }
 
 uint32_t AdaptiveRouting::GetOutPortFromPath(const uint32_t& path, const uint32_t& hopCount) {
@@ -563,8 +376,9 @@ void AdaptiveRouting::SetOutPortToPath(uint32_t& path, const uint32_t& hopCount,
 }
 
 void AdaptiveRouting::SetConstants(Time agingTime, Time flowletTimeout) {
-    m_agingTime = agingTime;
+    
 #if PER_FLOWLET
+    m_agingTime = agingTime;
     m_flowletTimeout = flowletTimeout;
 #endif
 }
@@ -595,50 +409,9 @@ void AdaptiveRouting::AgingEvent() {
             ++itr;
         }
     }
-// #else
-//     auto itr1 = m_adaptiveTxTable.begin();
-//     // 遍历 flowlet 表，检查每个 flowlet 条目的活跃时间是否超过了设定的 aging 时间
-//     while (itr1 != m_adaptiveTxTable.end()) {
-//         if (now - ((itr1->second)._activeTime) > m_agingTime) {
-//             // 如果超过 aging 时间，则从 flowlet 表中删除该条目
-//             itr1 = m_adaptiveTxTable.erase(itr1);
-//         } else {
-//             ++itr1;
-//         }
-//     }
-
-//     auto itr2 = m_adaptiveRxTable.begin();
-//     // 遍历 flowlet 表，检查每个 flowlet 条目的活跃时间是否超过了设定的 aging 时间
-//     while (itr2 != m_adaptiveRxTable.end()) {
-//         if (now - ((itr2->second)._activeTime) > m_agingTime) {
-//             // 如果超过 aging 时间，则从 flowlet 表中删除该条目
-//             itr2 = m_adaptiveRxTable.erase(itr2);
-//         } else {
-//             ++itr2;
-//         }
-//     }
-#endif
     // 更新 aging 事件，调度下一次 AgingEvent
     m_agingEvent = Simulator::Schedule(m_agingTime, &AdaptiveRouting::AgingEvent, this);
+#endif
+    
 }
-
-// #if PER_PACKET
-// void AdaptiveRouting::DeleteVOQ(uint64_t flowkey) {
-//     m_voqMap.erase(flowkey);
-// }
-
-// void AdaptiveRouting::CallbackByVOQFlush(uint64_t flowkey, uint32_t voqSize) {
-//     // update RxEntry
-//     auto &rxEntry = m_adaptiveRxTable[flowkey];  // flowcut entry
-//     assert(rxEntry._reordering == true);         // sanity check
-
-//     rxEntry._reordering = false;
-// }
-
-// void AdaptiveRouting::UpdateSeq(uint64_t flowkey, uint64_t seq) {
-//     // std::cout << "当前的flow " << flowkey << "的nextseq" << seq << std::endl;
-//     m_adaptiveRxTable[flowkey]._nextSeq = seq;
-// }
-// #endif
-
 }

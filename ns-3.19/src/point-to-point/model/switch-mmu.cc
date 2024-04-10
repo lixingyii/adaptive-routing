@@ -61,7 +61,7 @@ SwitchMmu::SwitchMmu(void) {
     // dynamic threshold
     m_dynamicth = true;
 
-    m_utlMeasureTime = MicroSeconds(20);
+    // m_utlMeasureTime = MicroSeconds(20);
 
     InitSwitch();
 }
@@ -134,12 +134,12 @@ void SwitchMmu::InitSwitch(void) {
     m_log_end = 2.2;
     m_log_step = 0.00001;
 
-    // 启动 utlMeasure 事件调度器
-    if (!m_utlMeasureEvent.IsRunning()) {
-        // std::cout << "开始测量实时链路利用率" << std::endl;
-        // NS_LOG_FUNCTION("Switch mmu restarts utl meature event scheduling:" << m_switch_id << now);
-        m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
-    }
+    // // 启动 utlMeasure 事件调度器
+    // if (!m_utlMeasureEvent.IsRunning()) {
+    //     // std::cout << "开始测量实时链路利用率" << std::endl;
+    //     // NS_LOG_FUNCTION("Switch mmu restarts utl meature event scheduling:" << m_switch_id << now);
+    //     m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
+    // }
 
 }
 
@@ -376,12 +376,12 @@ void SwitchMmu::RemoveFromIngressAdmission(uint32_t port, uint32_t qIndex, uint3
 // 用于从出口缓冲区中移除数据包并更新相应的缓冲区使用情况
 void SwitchMmu::RemoveFromEgressAdmission(uint32_t port, uint32_t qIndex, uint32_t psize) {
 
-    // 启动 utlMeasure 事件调度器
-    if (!m_utlMeasureEvent.IsRunning()) {
-        // std::cout << "开始测量实时链路利用率" << std::endl;
-        // NS_LOG_FUNCTION("Switch mmu restarts utl meature event scheduling:" << m_switch_id << now);
-        m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
-    }
+    // // 启动 utlMeasure 事件调度器
+    // if (!m_utlMeasureEvent.IsRunning()) {
+    //     // std::cout << "开始测量实时链路利用率" << std::endl;
+    //     // NS_LOG_FUNCTION("Switch mmu restarts utl meature event scheduling:" << m_switch_id << now);
+    //     m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
+    // }
 
     // 检查数据包是否已经在队列级保证缓冲区 q_min_cell 中。
     // 如果数据包在 q_min_cell 中，那么它会从该队列级缓冲区中减去 psize 的大小，以确保不会超过保证限制
@@ -392,7 +392,7 @@ void SwitchMmu::RemoveFromEgressAdmission(uint32_t port, uint32_t qIndex, uint32
         }
         m_usedEgressQMinBytes[port][qIndex] -= psize;
         m_usedEgressPortBytes[port] -= psize;
-        m_currOutPortBytes[port] += psize;  // 统计当前端口在当前测量周期中发送的字节数
+        // m_currOutPortBytes[port] += psize;  // 统计当前端口在当前测量周期中发送的字节数
         // std::cout << "当前端口" << port << "发送的数据量为" << m_currOutPortBytes[port] << std::endl;
         return;
     } else {
@@ -417,7 +417,7 @@ void SwitchMmu::RemoveFromEgressAdmission(uint32_t port, uint32_t qIndex, uint32
                 std::cerr << "STOP overflow\n";
             }
             m_usedEgressPortBytes[port] -= psize;
-            m_currOutPortBytes[port] += psize;
+            // m_currOutPortBytes[port] += psize;
             // std::cout << "当前端口" << port << "发送的数据量为" << m_currOutPortBytes[port] << std::endl;
 
         } 
@@ -433,7 +433,7 @@ void SwitchMmu::RemoveFromEgressAdmission(uint32_t port, uint32_t qIndex, uint32
             m_usedEgressQSharedBytes[port][qIndex] -= psize;
             m_usedEgressPortBytes[port] -= psize;
             m_usedEgressSPBytes[GetEgressSP(port, qIndex)] -= psize;
-            m_currOutPortBytes[port] += psize;
+            // m_currOutPortBytes[port] += psize;
             // std::cout << "当前端口" << port << "发送的数据量为" << m_currOutPortBytes[port] << std::endl;
         }
         return;
@@ -637,28 +637,28 @@ void SwitchMmu::ConfigBufferSize(uint32_t size) {
     InitSwitch();
 }
 
-void SwitchMmu::UtlMeasureEvent() {
-    /**
-     * @brief This function is just to keep the flowlet table small as possible, to reduce memory overhead.
-     */
-    NS_LOG_FUNCTION(Simulator::Now());
-    // std::cout << Simulator::Now() << std::endl;
+// void SwitchMmu::UtlMeasureEvent() {
+//     /**
+//      * @brief This function is just to keep the flowlet table small as possible, to reduce memory overhead.
+//      */
+//     NS_LOG_FUNCTION(Simulator::Now());
+//     // std::cout << Simulator::Now() << std::endl;
     
-    for (uint32_t i = 0; i < pCnt; i++)  // port 0 is not used
-    {
-        // std::cout << "当前端口" << i << "在该测量周期内发送数据量为" << m_currOutPortBytes[i] << std::endl;
-        // std::cout << "当前端口" << i << "在该测量周期内链路利用率为" << link_utl[i] << std::endl;
-        // if (i == 0) {
-        //     std::cout << "带宽为" << m_bw << std::endl;
-        //     std::cout << "测量周期为" << m_utlMeasureTime.GetNanoSeconds() << std::endl;
-        //     std::cout << "链路容量" << m_bw * m_utlMeasureTime.GetNanoSeconds() << std::endl;
-        // }
-        link_utl[i] = (m_currOutPortBytes[i] * 10e9) / (m_bw * m_utlMeasureTime.GetNanoSeconds());
-        m_currOutPortBytes[i] = 0;
-    }
+//     for (uint32_t i = 0; i < pCnt; i++)  // port 0 is not used
+//     {
+//         // std::cout << "当前端口" << i << "在该测量周期内发送数据量为" << m_currOutPortBytes[i] << std::endl;
+//         // std::cout << "当前端口" << i << "在该测量周期内链路利用率为" << link_utl[i] << std::endl;
+//         // if (i == 0) {
+//         //     std::cout << "带宽为" << m_bw << std::endl;
+//         //     std::cout << "测量周期为" << m_utlMeasureTime.GetNanoSeconds() << std::endl;
+//         //     std::cout << "链路容量" << m_bw * m_utlMeasureTime.GetNanoSeconds() << std::endl;
+//         // }
+//         link_utl[i] = (m_currOutPortBytes[i] * 10e9) / (m_bw * m_utlMeasureTime.GetNanoSeconds());
+//         m_currOutPortBytes[i] = 0;
+//     }
 
-    // 更新 UtlMeasure 事件，调度下一次 UtlMeasureEvent
-    m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
-}
+//     // 更新 UtlMeasure 事件，调度下一次 UtlMeasureEvent
+//     m_utlMeasureEvent = Simulator::Schedule(m_utlMeasureTime, &SwitchMmu::UtlMeasureEvent, this);
+// }
 
 }  // namespace ns3

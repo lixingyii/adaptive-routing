@@ -279,42 +279,42 @@ def all_reduce():
             single_time = 1 / (bandwidth * load / 8. / send_size) * 1000000000
             if start_time + single_time > time:
                 break
-            for i in range(0, dim_y * dim_x, dim_x):  # 先进行第一维度的Reduce-Scatter
-                reduce_scatter(impl_x,
-                               i,
-                               i + dim_x - 1,
-                               1,
-                               dim_x,
-                               total_size,
-                               start_time,
-                               start_time + single_time / 2 * (total_size / (total_size + total_size / dim_x))
-                               )
             for i in range(dim_x):  # 再进行第二维度的Reduce-Scatter
                 reduce_scatter(impl_y,
                                i,
                                n_host - 1,
                                dim_x,
                                dim_y,
+                               total_size,
+                               start_time,
+                               start_time + single_time / 2 * (total_size / (total_size + total_size / dim_x))
+                               )
+            for i in range(0, dim_y * dim_x, dim_x):  # 先进行第一维度的Reduce-Scatter
+                reduce_scatter(impl_x,
+                               i,
+                               i + dim_x - 1,
+                               1,
+                               dim_x,
                                total_size / dim_x,
                                start_time + single_time / 2 * (total_size / (total_size + total_size / dim_x)),
                                start_time + single_time / 2
                                )
-            for i in range(dim_x):  # 再进行第二维度的All_Gather
-                all_gather(impl_y,
-                           i,
-                           n_host - 1,
-                           dim_x,
-                           dim_y,
-                           total_size / dim_x,
-                           start_time + single_time / 2,
-                           start_time + single_time / 2 + single_time / 2 * ((total_size / dim_x) / (total_size + total_size / dim_x))
-                           )
             for i in range(0, dim_y * dim_x, dim_x):  # 最后进行第一维度的All_Gather
                 all_gather(impl_x,
                            i,
                            i + dim_x - 1,
                            1,
                            dim_x,
+                           total_size / dim_x,
+                           start_time + single_time / 2,
+                           start_time + single_time / 2 + single_time / 2 * ((total_size / dim_x) / (total_size + total_size / dim_x))
+                           )
+            for i in range(dim_x):  # 再进行第二维度的All_Gather
+                all_gather(impl_y,
+                           i,
+                           n_host - 1,
+                           dim_x,
+                           dim_y,
                            total_size,
                            start_time + single_time / 2 + single_time / 2 * ((total_size / dim_x) / (total_size + total_size / dim_x)),
                            start_time + single_time

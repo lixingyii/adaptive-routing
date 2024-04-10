@@ -175,7 +175,7 @@ uint32_t LetflowRouting::RouteInput(Ptr<Packet> p, CustomHeader ch) {
                 // 选择新的路径，并更新flowlet信息、增加数据包计数和 LetflowTag，
                 // 最后返回相应的出端口
                 // NS_LOG_FUNCTION("Flowlet expires, calculate the new port");
-                std::cout<<"1"<<std::endl;
+                // std::cout<<"1"<<std::endl;
                 selectedPath = GetRandomPath(dstToRId);
                 LetflowRouting::nFlowletTimeout++;
 

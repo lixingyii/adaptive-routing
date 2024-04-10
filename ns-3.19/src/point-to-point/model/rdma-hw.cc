@@ -135,6 +135,14 @@ RdmaHw::RdmaHw() {
     cnp_total = 0;
     cnp_by_ecn = 0;
     cnp_by_ooo = 0;
+
+#if PER_PACKET_NIC
+    m_agingTime = Time(MicroSeconds(10));
+    if (!m_agingEvent.IsRunning()) {
+        // NS_LOG_FUNCTION("Adaptive routing restarts aging event scheduling:" << m_switch_id << now);
+        m_agingEvent = Simulator::Schedule(m_agingTime, &RdmaHw::AgingEvent, this);
+    }
+#endif
 }
 
 void RdmaHw::SetNode(Ptr<Node> node) { m_node = node; }
@@ -156,7 +164,9 @@ void RdmaHw::Setup(QpCompleteCallback cb) {
     m_qpCompleteCallback = cb;
 }
 
+// 根据队列对的目的 IP 地址，获取与之关联的 NIC（Network Interface Controller）的索引
 uint32_t RdmaHw::GetNicIdxOfQp(Ptr<RdmaQueuePair> qp) {
+    // 从路由表中查找目的 IP 对应的 NIC 索引列表，然后根据哈希值选择其中一个索引返回
     auto &v = m_rtTable[qp->dip.Get()];
     if (v.size() > 0) {
         return v[qp->GetHash() % v.size()];
@@ -166,6 +176,7 @@ uint32_t RdmaHw::GetNicIdxOfQp(Ptr<RdmaQueuePair> qp) {
     exit(1);
 }
 
+// 根据队列对的目的 IP 地址、源端口、目的端口和 PG（Priority Group）生成一个唯一的键值，用于标识队列对
 uint64_t RdmaHw::GetQpKey(uint32_t dip, uint16_t sport, uint16_t dport,
                           uint16_t pg) {  // Sender perspective
     return ((uint64_t)dip << 32) | ((uint64_t)sport << 16) | (uint64_t)dport | (uint64_t)pg;
@@ -180,10 +191,13 @@ Ptr<RdmaQueuePair> RdmaHw::GetQp(uint64_t key) {
 
     return NULL;
 }
+
+//  创建一个新的队列对，并将其添加到适当的 NIC 中
 void RdmaHw::AddQueuePair(uint64_t size, uint16_t pg, Ipv4Address sip, Ipv4Address dip,
                           uint16_t sport, uint16_t dport, uint32_t win, uint64_t baseRtt,
                           int32_t flow_id) {
     // create qp
+    // 创建队列对对象，并设置其相关属性，包括大小、窗口大小、基础往返时延等
     Ptr<RdmaQueuePair> qp = CreateObject<RdmaQueuePair>(pg, sip, dip, sport, dport);
     qp->SetSize(size);
     qp->SetWin(win);
@@ -200,12 +214,15 @@ void RdmaHw::AddQueuePair(uint64_t size, uint16_t pg, Ipv4Address sip, Ipv4Addre
     }
 
     // add qp
+    // 根据目的 IP 地址选择与之关联的 NIC，并将队列对添加到该 NIC 的队列对组中
     uint32_t nic_idx = GetNicIdxOfQp(qp);
     m_nic[nic_idx].qpGrp->AddQp(qp);
+    // 接着生成队列对的唯一键值，并将其与队列对关联存储在 m_qpMap 中
     uint64_t key = GetQpKey(dip.Get(), sport, dport, pg);
     m_qpMap[key] = qp;
 
     // set init variables
+    //  CC（Congestion Control）模式设置队列对的初始变量，并通知 NIC 关联了新的队列对
     DataRate m_bps = m_nic[nic_idx].dev->GetDataRate();
     qp->m_rate = m_bps;
     qp->m_max_rate = m_bps;
@@ -237,6 +254,7 @@ void RdmaHw::DeleteQueuePair(Ptr<RdmaQueuePair> qp) {
 }
 
 // DATA UDP's src = this key's dst (receiver's dst)
+// 这个键值是为了唯一标识接收队列对，其中数据 UDP 包的源地址应该等于这个键值对应的目的地址（接收者的目的地址）
 uint64_t RdmaHw::GetRxQpKey(uint32_t dip, uint16_t dport, uint16_t sport,
                             uint16_t pg) {  // Receiver perspective
     return ((uint64_t)dip << 32) | ((uint64_t)pg << 16) | ((uint64_t)sport << 16) |
@@ -244,6 +262,7 @@ uint64_t RdmaHw::GetRxQpKey(uint32_t dip, uint16_t dport, uint16_t sport,
 }
 
 // src/dst are already flipped (this is calleld by UDP Data packet)
+// 在调用 GetRxQp 方法时，源地址和目的地址已经被交换，因此在生成键值时要考虑这一点
 Ptr<RdmaRxQueuePair> RdmaHw::GetRxQp(uint32_t sip, uint32_t dip, uint16_t sport, uint16_t dport,
                                      uint16_t pg, bool create) {
     uint64_t rxKey = GetRxQpKey(dip, dport, sport, pg);
@@ -290,11 +309,209 @@ void RdmaHw::DeleteRxQp(uint32_t dip, uint16_t dport, uint16_t sport, uint16_t p
 }
 
 int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
+
+#if PER_PACKET_NIC
+    // std::cout << m_irn << std::endl;
+    NS_ASSERT(m_irn != 0);  // 确保不启用irn
+    // 从自定义头 ch 中获取 IPv4 的 ECN（Explicit Congestion Notification）位，用于标识网络拥塞情况
     uint8_t ecnbits = ch.GetIpv4EcnBits();
 
+    // 计算数据包的有效负载大小，即去除自定义头后的大小
+    uint32_t payload_size = p->GetSize() - ch.GetSerializedSize();
+    
+
+    // find corresponding rx queue pair
+    // 获取相应的接收队列对（RxQP），根据数据包的目的 IP 地址、源 IP 地址、目的端口、源端口和 PG
+    Ptr<RdmaRxQueuePair> rxQp =
+        GetRxQp(ch.dip, ch.sip, ch.udp.dport, ch.udp.sport, ch.udp.pg, true);
+    uint64_t rxKey = GetRxQpKey(ch.sip, ch.udp.sport, ch.udp.dport, ch.udp.pg);
+    if (rxQp == NULL) {
+        if (akashic_RxQp.find(rxKey) != akashic_RxQp.end()) {
+            // printf("[GetRxQPUDP] Akashic access: %u(%d) -> %u(%d)\n", this->m_node->GetId(),
+            // ch.udp.dport, ch.sip, ch.udp.sport);
+            return 1;  // just drop
+        } else {
+            printf("ERROR: UDP NIC cannot find the flow\n");
+            exit(1);
+        }
+    }
+    // if(rxKey == 792772077184296720){
+    //     std::cout << "payload_size==" << payload_size << std::endl;
+    // }
+
+    // 如果 ecnbits 不等于零，表示接收到的数据包中包含了显式拥塞通知
+    if (ecnbits != 0) {
+        // 表示将接收到的数据包中的 ECN 位与 RxQP 中已有的 ECN 位进行按位或运算，以保留两者的共同置位信息
+        rxQp->m_ecn_source.ecnbits |= ecnbits;
+        // 表示增加 RxQP 中的 ECN 反馈计数器的值，以记录接收到的 ECN 消息数量
+        rxQp->m_ecn_source.qfb++;
+    }
+
+    // 更新 RxQP 中的一些其他信息，比如总接收数量、里程碑接收时间等
+    rxQp->m_ecn_source.total++;
+    rxQp->m_milestone_rx = m_ack_interval;
+
+    // 如果 RxQP 中的流 ID 为负数，则尝试从数据包中提取流 ID
+    if (rxQp->m_flow_id < 0) {
+        FlowIDNUMTag fit;
+        if (p->PeekPacketTag(fit)) {
+            rxQp->m_flow_id = fit.GetId();
+        }
+    }
+
+    bool cnp_check = false;
+    if(rxKey == 792753385486624532){
+        std::cout << "当前收到pkt的seq" << ch.udp.seq << std::endl;
+    }
+    // uint32_t curr_seq = ch.udp.seq;
+    int x = ReceiverCheckSeq(ch.udp.seq, rxQp, payload_size, cnp_check);
+    // std::cout <<"x = " <<  x << std::endl;
+    if (x == 1) {
+        qbbHeader seqh;
+        seqh.SetSeq(rxQp->ReceiverNextExpectedSeq);  // 使用接收队列对（RxQP）中的下一个期望序列号
+        seqh.SetPG(ch.udp.pg);  // 数据包组（PG）、源端口（Sport）和目的端口（Dport）等相关属性
+        seqh.SetSport(ch.udp.dport);
+        seqh.SetDport(ch.udp.sport);
+        seqh.SetIntHeader(ch.udp.ih);
+
+        // 如果 ECN 位不为零或需要检查 CNP（Congestion Notification Packet），则设置相关属性，并增加相应的统计计数
+        if (ecnbits || cnp_check) {  // NACK accompanies with CNP packet
+            // XXX monitor CNP generation at sender
+            cnp_total++;
+            if (ecnbits) cnp_by_ecn++;
+            if (cnp_check) cnp_by_ooo++;
+            seqh.SetCnp();
+        }
+
+        Ptr<Packet> newp =
+            Create<Packet>(std::max(60 - 14 - 20 - (int)seqh.GetSerializedSize(), 0));
+        newp->AddHeader(seqh);
+
+        // 创建一个新的数据包 newp，其大小根据确认或拒绝确认数据包头的序列化大小动态确定
+        Ipv4Header head;  // Prepare IPv4 header
+        // 设置 IPv4 头部信息，包括源地址、目的地址、协议类型（根据 x 的值设置为 ACK 或 NACK）、TTL 等
+        head.SetDestination(Ipv4Address(ch.sip));
+        head.SetSource(Ipv4Address(ch.dip));
+        head.SetProtocol(x == 1 ? 0xFC : 0xFD);  // ack=0xFC nack=0xFD
+        head.SetTtl(64);
+        head.SetPayloadSize(newp->GetSize());
+        head.SetIdentification(rxQp->m_ipid++);
+
+        {
+            // 如果原始数据包包含流 ID（Flow ID）标签，将其添加到新的数据包中
+            FlowIDNUMTag fit;
+            if (p->PeekPacketTag(fit)) {
+                newp->AddPacketTag(fit);
+            }
+        }
+
+        newp->AddHeader(head);
+        AddHeader(newp, 0x800);  // Attach PPP header
+
+        // send
+        // 将其加入到接收队列对所对应的 NIC 的高优先级队列中，并触发传输
+        uint32_t nic_idx = GetNicIdxOfRxQp(rxQp);
+        m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
+        m_nic[nic_idx].dev->TriggerTransmit();
+        
+        // std::cout << "send" << std::endl;
+
+        while (x == 1 && !m_pkt_buffer[rxKey].second.empty()){
+            Ptr<Packet> nxt_pkt = m_pkt_buffer[rxKey].second.top().first;  // 从对应rxKey的优先队列中取出队首
+            CustomHeader nxt_ch = m_pkt_buffer[rxKey].second.top().second;
+            // std::cout << "top out" << std::endl;
+            CustomHeader nxt_ch1(CustomHeader::L2_Header | CustomHeader::L3_Header | CustomHeader::L4_Header);
+            nxt_ch = m_pkt_buffer[rxKey].second.top().second;
+            // nxt_pkt->PeekHeader(nxt_ch);  // 将数据包的头部信息读取到自定义头部对象 ch 中
+            uint8_t nxt_ecnbits = nxt_ch.GetIpv4EcnBits();
+            uint32_t nxt_payload_size = nxt_pkt->GetSize() - nxt_ch1.GetSerializedSize();
+            // if(rxKey == 792772077184296720){
+            //     std::cout << "nxt_payload_size==" << nxt_payload_size << std::endl;
+            // }
+            bool cnp_check = false;
+            if(rxKey == 792753385486624532){
+                std::cout << "rxKey=" << rxKey << "缓冲区队首pkt的seq " << nxt_ch.udp.seq << std::endl;
+            }
+            x = ReceiverCheckSeq(nxt_ch.udp.seq, rxQp, nxt_payload_size, cnp_check);
+            // if(nxt_ch.udp.seq == 138000 && rxKey == 792772077184296720){
+            //     std::cout << "x==" << x << std::endl;
+            // }
+            if(x == 1){
+                m_pkt_buffer[rxKey].second.pop();
+                // m_buffer_table[rxKey] = Simulator::Now();
+                if(rxKey == 792753385486624532){
+                    std::cout << "rxKey=" << rxKey << " pop" << std::endl;
+                }
+                qbbHeader seqh;
+                seqh.SetSeq(rxQp->ReceiverNextExpectedSeq);  // 使用接收队列对（RxQP）中的下一个期望序列号
+                seqh.SetPG(ch.udp.pg);  // 数据包组（PG）、源端口（Sport）和目的端口（Dport）等相关属性
+                seqh.SetSport(ch.udp.dport);
+                seqh.SetDport(ch.udp.sport);
+                seqh.SetIntHeader(ch.udp.ih);
+                if (nxt_ecnbits || cnp_check) {  // NACK accompanies with CNP packet
+                    // XXX monitor CNP generation at sender
+                    cnp_total++;
+                    if (nxt_ecnbits) cnp_by_ecn++;
+                    if (cnp_check) cnp_by_ooo++;
+                    seqh.SetCnp();
+                }
+                Ptr<Packet> newp =
+                    Create<Packet>(std::max(60 - 14 - 20 - (int)seqh.GetSerializedSize(), 0));
+                newp->AddHeader(seqh);
+                Ipv4Header head;  // Prepare IPv4 header
+                head.SetDestination(Ipv4Address(ch.sip));
+                head.SetSource(Ipv4Address(ch.dip));
+                head.SetProtocol(x == 1 ? 0xFC : 0xFD);  // ack=0xFC nack=0xFD
+                head.SetTtl(64);
+                head.SetPayloadSize(newp->GetSize());
+                head.SetIdentification(rxQp->m_ipid++);
+                {
+                    FlowIDNUMTag fit;
+                    if (p->PeekPacketTag(fit)) {
+                        newp->AddPacketTag(fit);
+                    }
+                }
+                newp->AddHeader(head);
+                AddHeader(newp, 0x800);  // Attach PPP header
+                uint32_t nic_idx = GetNicIdxOfRxQp(rxQp);
+                m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
+                m_nic[nic_idx].dev->TriggerTransmit();
+            }
+        }
+        if(m_pkt_buffer[rxKey].second.empty()){
+            m_pkt_buffer.erase(rxKey);
+        }
+    }
+    else if (x == 2 || x == 6){
+        std::pair<Ptr<Packet>, CustomHeader> new_pkt;
+        // uint32_t seq = ch.udp.seq;
+        CustomHeader new_ch(CustomHeader::L2_Header | CustomHeader::L3_Header | CustomHeader::L4_Header); 
+        new_ch = ch;
+        new_pkt = std::make_pair(p, new_ch);
+        // if(rxKey == 792772077184296720){
+        //     std::cout << curr_seq << std::endl;
+        // }
+        
+        if (m_pkt_buffer[rxKey].second.empty()) {
+            m_pkt_buffer[rxKey].first = Simulator::Now();
+        }
+        m_pkt_buffer[rxKey].second.push(new_pkt);
+        // m_buffer_table[rxKey] = Simulator::Now();
+        if (rxKey == 792753385486624532){
+            std::cout << "rxKey=" << rxKey << " push" << std::endl;
+        }
+    }
+    return 0;
+
+#else
+    // 从自定义头 ch 中获取 IPv4 的 ECN（Explicit Congestion Notification）位，用于标识网络拥塞情况
+    uint8_t ecnbits = ch.GetIpv4EcnBits();
+
+    // 计算数据包的有效负载大小，即去除自定义头后的大小
     uint32_t payload_size = p->GetSize() - ch.GetSerializedSize();
 
     // find corresponding rx queue pair
+    // 获取相应的接收队列对（RxQP），根据数据包的目的 IP 地址、源 IP 地址、目的端口、源端口和 PG
     Ptr<RdmaRxQueuePair> rxQp =
         GetRxQp(ch.dip, ch.sip, ch.udp.dport, ch.udp.sport, ch.udp.pg, true);
     if (rxQp == NULL) {
@@ -309,14 +526,19 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
         }
     }
 
+    // 如果 ecnbits 不等于零，表示接收到的数据包中包含了显式拥塞通知
     if (ecnbits != 0) {
+        // 表示将接收到的数据包中的 ECN 位与 RxQP 中已有的 ECN 位进行按位或运算，以保留两者的共同置位信息
         rxQp->m_ecn_source.ecnbits |= ecnbits;
+        // 表示增加 RxQP 中的 ECN 反馈计数器的值，以记录接收到的 ECN 消息数量
         rxQp->m_ecn_source.qfb++;
     }
 
+    // 更新 RxQP 中的一些其他信息，比如总接收数量、里程碑接收时间等
     rxQp->m_ecn_source.total++;
     rxQp->m_milestone_rx = m_ack_interval;
 
+    // 如果 RxQP 中的流 ID 为负数，则尝试从数据包中提取流 ID
     if (rxQp->m_flow_id < 0) {
         FlowIDNUMTag fit;
         if (p->PeekPacketTag(fit)) {
@@ -324,13 +546,18 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
         }
     }
 
+    uint64_t rxKey = GetRxQpKey(ch.sip, ch.udp.sport, ch.udp.dport, ch.udp.pg);
+    // if(rxKey == 792686315277068048){
+    //     std::cout << "rxKey = "  << rxKey << " 当前收到pkt的seq" << ch.udp.seq << std::endl;
+    // }
+    // 调用 ReceiverCheckSeq 函数检查数据包的序列号，如果需要生成 ACK 或 NACK，则执行相应的操作
     bool cnp_check = false;
     int x = ReceiverCheckSeq(ch.udp.seq, rxQp, payload_size, cnp_check);
 
     if (x == 1 || x == 2 || x == 6) {  // generate ACK or NACK
         qbbHeader seqh;
-        seqh.SetSeq(rxQp->ReceiverNextExpectedSeq);
-        seqh.SetPG(ch.udp.pg);
+        seqh.SetSeq(rxQp->ReceiverNextExpectedSeq);  // 使用接收队列对（RxQP）中的下一个期望序列号
+        seqh.SetPG(ch.udp.pg);  // 数据包组（PG）、源端口（Sport）和目的端口（Dport）等相关属性
         seqh.SetSport(ch.udp.dport);
         seqh.SetDport(ch.udp.sport);
         seqh.SetIntHeader(ch.udp.ih);
@@ -345,6 +572,7 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
             }
         }
 
+        // 如果 ECN 位不为零或需要检查 CNP（Congestion Notification Packet），则设置相关属性，并增加相应的统计计数
         if (ecnbits || cnp_check) {  // NACK accompanies with CNP packet
             // XXX monitor CNP generation at sender
             cnp_total++;
@@ -357,15 +585,21 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
             Create<Packet>(std::max(60 - 14 - 20 - (int)seqh.GetSerializedSize(), 0));
         newp->AddHeader(seqh);
 
+        // 创建一个新的数据包 newp，其大小根据确认或拒绝确认数据包头的序列化大小动态确定
         Ipv4Header head;  // Prepare IPv4 header
+        // 设置 IPv4 头部信息，包括源地址、目的地址、协议类型（根据 x 的值设置为 ACK 或 NACK）、TTL 等
         head.SetDestination(Ipv4Address(ch.sip));
         head.SetSource(Ipv4Address(ch.dip));
         head.SetProtocol(x == 1 ? 0xFC : 0xFD);  // ack=0xFC nack=0xFD
+        // if(rxKey == 792686315277068048 && x != 1){
+        //     std::cout << "rxKey = "  << rxKey << " 已乱序"<< std::endl;
+        // }
         head.SetTtl(64);
         head.SetPayloadSize(newp->GetSize());
         head.SetIdentification(rxQp->m_ipid++);
 
         {
+            // 如果原始数据包包含流 ID（Flow ID）标签，将其添加到新的数据包中
             FlowIDNUMTag fit;
             if (p->PeekPacketTag(fit)) {
                 newp->AddPacketTag(fit);
@@ -376,11 +610,15 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
         AddHeader(newp, 0x800);  // Attach PPP header
 
         // send
+        // 将其加入到接收队列对所对应的 NIC 的高优先级队列中，并触发传输
         uint32_t nic_idx = GetNicIdxOfRxQp(rxQp);
         m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
         m_nic[nic_idx].dev->TriggerTransmit();
+
+        
     }
     return 0;
+#endif
 }
 
 int RdmaHw::ReceiveCnp(Ptr<Packet> p, CustomHeader &ch) {
@@ -464,12 +702,13 @@ int RdmaHw::ReceiveAck(Ptr<Packet> p, CustomHeader &ch) {
     uint32_t nic_idx = GetNicIdxOfQp(qp);
     Ptr<QbbNetDevice> dev = m_nic[nic_idx].dev;
 
+    // 否则，将确认序列号设置为当前序列号除以分片大小后再乘以分片大小
     if (m_ack_interval == 0)
         std::cout << "ERROR: shouldn't receive ack\n";
     else {
-        if (!m_backto0) {
+        if (!m_backto0) {  // 如果不是返回零重传（backto0）模式，则确认序列号为当前序列号；
             qp->Acknowledge(seq);
-        } else {
+        } else {  // 否则，将确认序列号设置为当前序列号除以分片大小后再乘以分片大小
             uint32_t goback_seq = seq / m_chunk * m_chunk;
             qp->Acknowledge(goback_seq);
         }
@@ -521,8 +760,11 @@ int RdmaHw::ReceiveAck(Ptr<Packet> p, CustomHeader &ch) {
      * packet, but rather simply detects the persistent absence of response
      * packets.
      * */
+    // 检查队列对（QP）是否已完成传输并且仍有在途的数据包（即尚未确认的数据包）
     if (!qp->IsFinished() && qp->GetOnTheFly() > 0) {
-        if (qp->m_retransmit.IsRunning()) qp->m_retransmit.Cancel();
+        // 检查重传定时器是否已经在运行
+        if (qp->m_retransmit.IsRunning()) qp->m_retransmit.Cancel();  // 取消之前的定时器，以便重新安排新的定时器
+        // 定时器的触发时间由 qp->GetRto(m_mtu) 决定，该函数返回一个 RTO（Retransmission Timeout）的时间值
         qp->m_retransmit = Simulator::Schedule(qp->GetRto(m_mtu), &RdmaHw::HandleTimeout, this, qp,
                                                qp->GetRto(m_mtu));
     }
@@ -599,11 +841,19 @@ int RdmaHw::Receive(Ptr<Packet> p, CustomHeader &ch) {
  */
 int RdmaHw::ReceiverCheckSeq(uint32_t seq, Ptr<RdmaRxQueuePair> q, uint32_t size, bool &cnp) {
     uint32_t expected = q->ReceiverNextExpectedSeq;
+    // 如果序列号与期望的下一个序列号相等，或者序列号小于期望的序列号但是序列号加上数据包大小后大于等于期望的序列号
     if (seq == expected || (seq < expected && seq + size >= expected)) {
-        if (m_irn) {
+        if (m_irn) {  // 启用了 IRN（Immediate Reliable Notification）
+            // 接收方会更新里程碑接收序列号 q->m_milestone_rx，确保它不小于当前数据包的序列号加上数据包大小
             if (q->m_milestone_rx < seq + size) q->m_milestone_rx = seq + size;
+            // 接收方将期望的下一个序列号 q->ReceiverNextExpectedSeq 更新为当前期望的序列号加上当前数据包的大小减去期望的序列号与当前序列号之差。
+            // 这是为了处理数据包可能不是按顺序到达的情况
             q->ReceiverNextExpectedSeq += size - (expected - seq);
+
             {
+                // 接收方会检查是否存在已接收但尚未处理的 SACK（Selective Acknowledgment，选择性确认）块。
+                // 如果存在，接收方会调整期望的下一个序列号，确保它不小于当前已确认的最大序列号。
+                // 这是为了确保接收方不会错误地产生 NACK
                 uint32_t sack_seq, sack_len;
                 if (q->m_irn_sack_.peekFrontBlock(&sack_seq, &sack_len)) {
                     if (sack_seq <= q->ReceiverNextExpectedSeq)
@@ -1353,5 +1603,83 @@ void RdmaHw::HandleAckDctcp(Ptr<RdmaQueuePair> qp, Ptr<Packet> p, CustomHeader &
     if (qp->dctcp.m_caState == 0 && new_batch)
         qp->m_rate = std::min(qp->m_max_rate, qp->m_rate + m_dctcp_rai);
 }
+
+#if PER_PACKET_NIC
+void RdmaHw::AgingEvent() {
+    NS_LOG_FUNCTION(Simulator::Now());
+    auto now = Simulator::Now();
+    auto itr = m_pkt_buffer.begin();
+    // 遍历 flowlet 表，检查每个 flowlet 条目的活跃时间是否超过了设定的 aging 时间
+    while (itr != m_pkt_buffer.end()) {
+        if (!itr->second.second.empty() && now - itr->second.first > MicroSeconds(200)) {
+            while (!itr->second.second.empty()) {
+                CustomHeader ch = itr->second.second.top().second;
+                Ptr<RdmaRxQueuePair> rxQp =
+                    GetRxQp(ch.dip, ch.sip, ch.udp.dport, ch.udp.sport, ch.udp.pg, true);
+                qbbHeader seqh;
+                seqh.SetSeq(rxQp->ReceiverNextExpectedSeq);  // 使用接收队列对（RxQP）中的下一个期望序列号
+                seqh.SetPG(ch.udp.pg);  // 数据包组（PG）、源端口（Sport）和目的端口（Dport）等相关属性
+                seqh.SetSport(ch.udp.dport);
+                seqh.SetDport(ch.udp.sport);
+                seqh.SetIntHeader(ch.udp.ih);
+
+                uint8_t ecnbits = ch.GetIpv4EcnBits();
+                bool cnp_check = false;
+
+                // 如果 ECN 位不为零或需要检查 CNP（Congestion Notification Packet），则设置相关属性，并增加相应的统计计数
+                if (ecnbits || cnp_check) {  // NACK accompanies with CNP packet
+                    // XXX monitor CNP generation at sender
+                    cnp_total++;
+                    if (ecnbits) cnp_by_ecn++;
+                    if (cnp_check) cnp_by_ooo++;
+                    seqh.SetCnp();
+                }
+
+                Ptr<Packet> newp =
+                    Create<Packet>(std::max(60 - 14 - 20 - (int)seqh.GetSerializedSize(), 0));
+                newp->AddHeader(seqh);
+
+                // 创建一个新的数据包 newp，其大小根据确认或拒绝确认数据包头的序列化大小动态确定
+                Ipv4Header head;  // Prepare IPv4 header
+                // 设置 IPv4 头部信息，包括源地址、目的地址、协议类型（根据 x 的值设置为 ACK 或 NACK）、TTL 等
+                head.SetDestination(Ipv4Address(ch.sip));
+                head.SetSource(Ipv4Address(ch.dip));
+                head.SetProtocol(0xFD);  // ack=0xFC nack=0xFD
+                head.SetTtl(64);
+                head.SetPayloadSize(newp->GetSize());
+                head.SetIdentification(rxQp->m_ipid++);
+
+                {
+                    // 如果原始数据包包含流 ID（Flow ID）标签，将其添加到新的数据包中
+                    FlowIDNUMTag fit;
+                    if (itr->second.second.top().first->PeekPacketTag(fit)) {
+                        newp->AddPacketTag(fit);
+                    }
+                }
+
+                newp->AddHeader(head);
+                AddHeader(newp, 0x800);  // Attach PPP header
+
+                // send
+                // 将其加入到接收队列对所对应的 NIC 的高优先级队列中，并触发传输
+                uint32_t nic_idx = GetNicIdxOfRxQp(rxQp);
+                m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
+                m_nic[nic_idx].dev->TriggerTransmit();
+                
+                itr->second.second.pop();
+            }
+            if(itr->first == 792753385486624532){
+                std::cout << "超时" << std::endl;
+            }
+            itr = m_pkt_buffer.erase(itr);
+        } else {
+            ++itr;
+        }
+    }
+    // 更新 aging 事件，调度下一次 AgingEvent
+    m_agingEvent = Simulator::Schedule(m_agingTime, &RdmaHw::AgingEvent, this);
+ 
+}
+#endif
 
 }  // namespace ns3
