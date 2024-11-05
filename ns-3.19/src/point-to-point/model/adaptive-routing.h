@@ -21,6 +21,7 @@ namespace ns3{
 
 #define PER_PACKET 0
 #define PER_FLOWLET 1
+#define DEBUG 1
 
 class AdaptiveTag : public Tag {
 public:
@@ -80,7 +81,7 @@ public:
     virtual void DoDispose();
 
     /* SET functions */
-    void SetConstants(Time agingTime, Time flowletTimeout);
+    void SetConstants(Time agingTime, Time flowletTimeout, uint32_t flowletNPackets);
     void SetSwitchInfo(bool isToR, uint32_t switch_id);
 
     // periodic events for flowlet timeout
@@ -114,6 +115,7 @@ private:
 #if PER_FLOWLET
     Time m_agingTime;       // expiry of flowlet entry
     Time m_flowletTimeout;  // flowlet timeout (e.g., 100us)
+    uint32_t m_flowletNPackets;
 
     // local
     std::map<uint64_t, Flowlet*> m_flowletTable;  // QpKey -> Flowlet (at SrcToR)

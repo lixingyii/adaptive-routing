@@ -65,33 +65,36 @@ uint32_t conga_quantizeBit = 3;
 double conga_alpha = 0.2;
 
 // Letflow params
-Time letflow_flowletTimeout = MicroSeconds(50);
+// Time letflow_flowletTimeout = MicroSeconds(0.5);
+Time letflow_flowletTimeout = NanoSeconds(1000);
 Time letflow_agingTime = MilliSeconds(2);  // just to clear the unused map entries for simul speed
 
 // AdaptiveRouting params
-Time adaptive_flowletTimeout = MicroSeconds(50);
+// Time adaptive_flowletTimeout = MicroSeconds(0.5);
+Time adaptive_flowletTimeout = NanoSeconds(5000);
+uint32_t adaptive_flowletNPackets = 50;
 Time adaptive_agingTime = MilliSeconds(2);  // just to clear the unused map entries for simul speed
 
 // uint64_t utl_bw = 0;
 
 // Conweave params
 // θreply，Continuous RTT monitoring中RTT_REPLY的超时值
-Time conweave_extraReplyDeadline = MicroSeconds(4);       // additional term to reply deadline
+Time conweave_extraReplyDeadline = NanoSeconds(100);       // additional term to reply deadline
 // θpath_busy，Path selection中收到NOTIFY数据包后，SrcToR将在θpath_busy时间内将相应路径标记为不可用
-Time conweave_pathPauseTime = MicroSeconds(8);            // time to send packets to congested path
+Time conweave_pathPauseTime = NanoSeconds(200);            // time to send packets to congested path
 // θinactive，防止CLEAR数据包丢失或DstToR未发送，如果超过θinactive，ConWeave会自动进入下一个epoch
 Time conweave_txExpiryTime = MicroSeconds(1000);          // waiting time for CLEAR
 // Tresume，防止TAIL丢包，voq的恢复时间
-Time conweave_extraVOQFlushTime = MicroSeconds(32);       // extra for uncertainty
+Time conweave_extraVOQFlushTime = MicroSeconds(64);       // extra for uncertainty
 // 包在voq的平均等待时间，较短的等待时间通常会导致较低的传输延迟，较长的等待时间可能有助于提高网络的吞吐量
 Time conweave_defaultVOQWaitingTime = MicroSeconds(500);  // default flush timer if no history
 bool conweave_pathAwareRerouting = true;
 
 /*------------------------ simulation variables -----------------------------*/
 // 网络中一个跳跃（hop）的时延，它表示两个相邻网络节点之间的传输延迟
-uint64_t one_hop_delay = 1000;  // nanoseconds
+uint64_t one_hop_delay = 40;  // nanoseconds
 uint32_t cc_mode = 1;           // mode for congestion control, 1: DCQCN
-bool enable_qcn = true, enable_pfc = true, use_dynamic_pfc_threshold = true;
+bool enable_qcn = true, enable_pfc = true, use_dynamic_pfc_threshold = false;
 // 数据包的有效载荷大小为1000字节，Layer-2（链路层）数据块的大小，Layer-2 ACK（应答）的时间间隔
 uint32_t packet_payload_size = 1000, l2_chunk_size = 0, l2_ack_interval = 0;
 double pause_time = 5;  // PFC pause, microseconds
@@ -429,8 +432,17 @@ void letflow_history_print() {
  */
 void adaptive_history_print() {
     std::cout << "\n------------AdaptiveRouting History---------------" << std::endl;
-    // std::cout << "Number of flowlet's timeout:" << AdaptiveRouting::nFlowletTimeout
-    //           << "\nAdaptive's timeout: " << adaptive_flowletTimeout << std::endl;
+    std::cout << "Number of flowlet's timeout:" << AdaptiveRouting::nFlowletTimeout
+              << "\nAdaptive's size: " << adaptive_flowletNPackets << std::endl;
+    for (uint32_t i = 0; i < Settings::node_num; i++) {
+        if (n.Get(i)->GetNodeType() == 0) {  // is server
+            Ptr<Node> server = n.Get(i);
+            Ptr<RdmaDriver> rdmaDriver = server->GetObject<RdmaDriver>();
+            Ptr<RdmaHw> rdmaHw = rdmaDriver->m_rdma;
+            // monitor total/active QP number <time, serverId, #ExistingQP, #ActiveQP>
+            std::cout << "The OOD of node " << i << "=" << rdmaHw->m_OOD << std::endl;
+        }
+    }
 }
 
 /**
@@ -1445,8 +1457,10 @@ int main(int argc, char *argv[]) {
 
     // manually type BDP
     std::map<std::string, uint32_t> topo2bdpMap;
-    topo2bdpMap[std::string("leaf_spine_128_400G_OS2")] = 606000;  // 以前是104000 RTT=8320 RTT*12.5
-    topo2bdpMap[std::string("fat_k8_100G_OS2")] = 156000;      // RTT=12480 --> all 100G links
+    topo2bdpMap[std::string("leaf_spine_128_400G_OS2")] = 20000;  // 以前是104000 RTT=8320 RTT*12.5
+    topo2bdpMap[std::string("leaf_spine_256_400G_OS1")] = 20000;
+    topo2bdpMap[std::string("leaf_spine_16_400G_OS1")] = 20000;
+    topo2bdpMap[std::string("fat_k8_128_400G_OS1")] = 30000;      // RTT=12480 --> all 100G links
 
     // topology_file
     bool found_topo2bdpMap = false;
@@ -1559,7 +1573,7 @@ int main(int argc, char *argv[]) {
             if (rtt > maxRtt) maxRtt = rtt;
         }
     }
-    // std::cout << "maxRtt:" << maxRtt << "," << "maxBdp:" << maxBdp << endl;
+    std::cout << "maxRtt:" << maxRtt << "," << "maxBdp:" << maxBdp << endl;
     fprintf(stderr, "maxRtt: %lu, maxBdp: %lu\n", maxRtt, maxBdp);
     assert(maxBdp == irn_bdp_lookup);
 
@@ -1805,7 +1819,8 @@ int main(int argc, char *argv[]) {
                 }
                 if (lb_mode == 11) {
                     sw->m_mmu->m_adaptiveRouting.SetConstants(adaptive_agingTime,
-                                                            adaptive_flowletTimeout);
+                                                            adaptive_flowletTimeout,
+                                                            adaptive_flowletNPackets);
                     sw->m_mmu->m_adaptiveRouting.SetSwitchInfo(sw->m_isToR, sw->GetId());
                 }
                 // sw->m_mmu->m_bw = utl_bw;

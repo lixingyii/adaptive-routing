@@ -174,9 +174,9 @@ ConWeaveRouting::ConWeaveRouting() {
     m_switch_id = (uint32_t)-1;
 
     // set constants
-    m_extraReplyDeadline = MicroSeconds(4);       // 1 hop of 50KB / 100Gbps = 4us
+    m_extraReplyDeadline = MicroSeconds(1);       // 1 hop of 50KB / 100Gbps = 4us
     m_extraVOQFlushTime = MicroSeconds(8);        // for uncertainty
-    m_txExpiryTime = MicroSeconds(300);           // flowlet timegap
+    m_txExpiryTime = MicroSeconds(1);           // flowlet timegap
     m_defaultVOQWaitingTime = MicroSeconds(200);  // 200us
     m_pathPauseTime = MicroSeconds(8);            // 100KB queue, 100Gbps -> 8us
     m_pathAwareRerouting = true;                  // enable path-aware rerouting

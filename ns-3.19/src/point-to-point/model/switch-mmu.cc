@@ -29,7 +29,7 @@ TypeId SwitchMmu::GetTypeId(void) {
             .AddAttribute("EgressAlpha", "Broadcom Egress alpha", DoubleValue(1.),
                           MakeDoubleAccessor(&SwitchMmu::m_pg_shared_alpha_cell_egress),
                           MakeDoubleChecker<double>())
-            .AddAttribute("DynamicThreshold", "Broadcom Egress alpha", BooleanValue(true),
+            .AddAttribute("DynamicThreshold", "Broadcom Egress alpha", BooleanValue(false),
                           MakeBooleanAccessor(&SwitchMmu::SetDynamicThreshold,
                                               &SwitchMmu::GetDynamicThreshold),
                           MakeBooleanChecker())
@@ -59,7 +59,7 @@ SwitchMmu::SwitchMmu(void) {
     m_uniform_random_var.SetStream(0);
 
     // dynamic threshold
-    m_dynamicth = true;
+    m_dynamicth = false;
 
     // m_utlMeasureTime = MicroSeconds(20);
 
@@ -467,6 +467,7 @@ void SwitchMmu::GetPauseClasses(uint32_t port, uint32_t qIndex, bool pClasses[])
             }
         }
     } else {  // 采用静态阈值
+        // std::cout << "当前端口" << port << "的队列" << qIndex << "的数据量为" << m_usedIngressPGBytes[port][qIndex] << std::endl;
         // 如果端口级已使用缓冲区大小（m_usedIngressPortBytes[port]）大于静态阈值（m_port_max_shared_cell），表示整个端口都应该被暂停
         if (m_usedIngressPortBytes[port] > m_port_max_shared_cell)  // pause the whole port
         {
@@ -481,6 +482,7 @@ void SwitchMmu::GetPauseClasses(uint32_t port, uint32_t qIndex, bool pClasses[])
         }
         // 方法将遍历队列，并将每个队列的 pClasses 根据是否超出队列级共享限制（m_pg_shared_limit_cell）进行设置
         if (m_usedIngressPGBytes[port][qIndex] > m_pg_shared_limit_cell) {
+            // std::cout << "当前端口" << port << "的队列" << qIndex << "的数据量为" << m_usedIngressPGBytes[port][qIndex] << std::endl;
             pClasses[qIndex] = true;
         }
     }
@@ -598,7 +600,9 @@ void SwitchMmu::SetBroadcomParams(
 
 uint32_t SwitchMmu::GetUsedBufferTotal() { return m_usedTotalBytes; }
 
-uint32_t SwitchMmu::GetUsedEgressPortBytes(uint32_t port) { return m_usedEgressPortBytes[port]; }
+uint32_t SwitchMmu::GetUsedEgressPortBytes(uint32_t port) { 
+    return m_usedEgressQSharedBytes[port][3] + m_usedEgressQMinBytes[port][3]; 
+}
 
 void SwitchMmu::SetDynamicThreshold(bool v) {
     m_dynamicth = v;

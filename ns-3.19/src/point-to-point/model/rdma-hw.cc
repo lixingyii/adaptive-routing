@@ -137,7 +137,7 @@ RdmaHw::RdmaHw() {
     cnp_by_ooo = 0;
 
 #if PER_PACKET_NIC
-    m_agingTime = Time(MicroSeconds(10));
+    m_agingTime = Time(MicroSeconds(2000));
     if (!m_agingEvent.IsRunning()) {
         // NS_LOG_FUNCTION("Adaptive routing restarts aging event scheduling:" << m_switch_id << now);
         m_agingEvent = Simulator::Schedule(m_agingTime, &RdmaHw::AgingEvent, this);
@@ -335,9 +335,6 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
             exit(1);
         }
     }
-    // if(rxKey == 792772077184296720){
-    //     std::cout << "payload_size==" << payload_size << std::endl;
-    // }
 
     // 如果 ecnbits 不等于零，表示接收到的数据包中包含了显式拥塞通知
     if (ecnbits != 0) {
@@ -360,11 +357,10 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
     }
 
     bool cnp_check = false;
-    if(rxKey == 792753385486624532){
-        std::cout << "当前收到pkt的seq" << ch.udp.seq << std::endl;
-    }
-    // uint32_t curr_seq = ch.udp.seq;
     int x = ReceiverCheckSeq(ch.udp.seq, rxQp, payload_size, cnp_check);
+    // if(rxKey == 792758883044501264){
+    //     std::cout << "rxKey = "  << rxKey << " 当前收到pkt的seq" << ch.udp.seq << " x = "<< x << std::endl;
+    // }
     // std::cout <<"x = " <<  x << std::endl;
     if (x == 1) {
         qbbHeader seqh;
@@ -422,26 +418,16 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
             // std::cout << "top out" << std::endl;
             CustomHeader nxt_ch1(CustomHeader::L2_Header | CustomHeader::L3_Header | CustomHeader::L4_Header);
             nxt_ch = m_pkt_buffer[rxKey].second.top().second;
-            // nxt_pkt->PeekHeader(nxt_ch);  // 将数据包的头部信息读取到自定义头部对象 ch 中
             uint8_t nxt_ecnbits = nxt_ch.GetIpv4EcnBits();
             uint32_t nxt_payload_size = nxt_pkt->GetSize() - nxt_ch1.GetSerializedSize();
-            // if(rxKey == 792772077184296720){
-            //     std::cout << "nxt_payload_size==" << nxt_payload_size << std::endl;
-            // }
             bool cnp_check = false;
-            if(rxKey == 792753385486624532){
-                std::cout << "rxKey=" << rxKey << "缓冲区队首pkt的seq " << nxt_ch.udp.seq << std::endl;
-            }
             x = ReceiverCheckSeq(nxt_ch.udp.seq, rxQp, nxt_payload_size, cnp_check);
-            // if(nxt_ch.udp.seq == 138000 && rxKey == 792772077184296720){
-            //     std::cout << "x==" << x << std::endl;
-            // }
             if(x == 1){
+                // if (rxKey == 792643434324109072){
+                //     std::cout << "rxKey=" << rxKey << " pop " << nxt_ch.udp.seq <<std::endl;
+                //     // std::cout << std::endl;
+                // }
                 m_pkt_buffer[rxKey].second.pop();
-                // m_buffer_table[rxKey] = Simulator::Now();
-                if(rxKey == 792753385486624532){
-                    std::cout << "rxKey=" << rxKey << " pop" << std::endl;
-                }
                 qbbHeader seqh;
                 seqh.SetSeq(rxQp->ReceiverNextExpectedSeq);  // 使用接收队列对（RxQP）中的下一个期望序列号
                 seqh.SetPG(ch.udp.pg);  // 数据包组（PG）、源端口（Sport）和目的端口（Dport）等相关属性
@@ -482,7 +468,7 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
             m_pkt_buffer.erase(rxKey);
         }
     }
-    else if (x == 2 || x == 6){
+    else{
         std::pair<Ptr<Packet>, CustomHeader> new_pkt;
         // uint32_t seq = ch.udp.seq;
         CustomHeader new_ch(CustomHeader::L2_Header | CustomHeader::L3_Header | CustomHeader::L4_Header); 
@@ -497,9 +483,10 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
         }
         m_pkt_buffer[rxKey].second.push(new_pkt);
         // m_buffer_table[rxKey] = Simulator::Now();
-        if (rxKey == 792753385486624532){
-            std::cout << "rxKey=" << rxKey << " push" << std::endl;
-        }
+        // if (rxKey == 792643434324109072){
+        //     std::cout << "rxKey=" << rxKey << " push " << ch.udp.seq <<std::endl;
+        //     // std::cout << std::endl;
+        // }
     }
     return 0;
 
@@ -547,7 +534,7 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
     }
 
     uint64_t rxKey = GetRxQpKey(ch.sip, ch.udp.sport, ch.udp.dport, ch.udp.pg);
-    // if(rxKey == 792686315277068048){
+    // if(rxKey == 792758883044501264){
     //     std::cout << "rxKey = "  << rxKey << " 当前收到pkt的seq" << ch.udp.seq << std::endl;
     // }
     // 调用 ReceiverCheckSeq 函数检查数据包的序列号，如果需要生成 ACK 或 NACK，则执行相应的操作
@@ -591,7 +578,7 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch) {
         head.SetDestination(Ipv4Address(ch.sip));
         head.SetSource(Ipv4Address(ch.dip));
         head.SetProtocol(x == 1 ? 0xFC : 0xFD);  // ack=0xFC nack=0xFD
-        // if(rxKey == 792686315277068048 && x != 1){
+        // if(rxKey == 792758883044501264 && x != 1){
         //     std::cout << "rxKey = "  << rxKey << " 已乱序"<< std::endl;
         // }
         head.SetTtl(64);
@@ -883,6 +870,7 @@ int RdmaHw::ReceiverCheckSeq(uint32_t seq, Ptr<RdmaRxQueuePair> q, uint32_t size
             return 5;
         }
     } else if (seq > expected) {
+        m_OOD = (seq - expected) > m_OOD ? seq - expected : m_OOD;
         // Generate NACK
         if (m_irn) {
             if (q->m_milestone_rx < seq + size) q->m_milestone_rx = seq + size;
@@ -1611,7 +1599,7 @@ void RdmaHw::AgingEvent() {
     auto itr = m_pkt_buffer.begin();
     // 遍历 flowlet 表，检查每个 flowlet 条目的活跃时间是否超过了设定的 aging 时间
     while (itr != m_pkt_buffer.end()) {
-        if (!itr->second.second.empty() && now - itr->second.first > MicroSeconds(200)) {
+        if (!itr->second.second.empty() && now - itr->second.first > m_agingTime) {
             while (!itr->second.second.empty()) {
                 CustomHeader ch = itr->second.second.top().second;
                 Ptr<RdmaRxQueuePair> rxQp =
@@ -1667,9 +1655,6 @@ void RdmaHw::AgingEvent() {
                 m_nic[nic_idx].dev->TriggerTransmit();
                 
                 itr->second.second.pop();
-            }
-            if(itr->first == 792753385486624532){
-                std::cout << "超时" << std::endl;
             }
             itr = m_pkt_buffer.erase(itr);
         } else {

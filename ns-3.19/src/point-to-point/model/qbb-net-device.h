@@ -35,6 +35,8 @@
 #include <unordered_map>
 #include <ns3/rdma.h>
 
+#define ADAPTIVE 1
+
 namespace ns3 {
 
 class RdmaEgressQueue : public Object{
@@ -132,6 +134,9 @@ public:
    void ReassignedQp(Ptr<RdmaQueuePair> qp);
    void TriggerTransmit(void);
    bool GetPaused(uint32_t q);
+#if ADAPTIVE
+   Time GetTime2Resume(uint32_t q);
+#endif
 
    bool IsQbbEnabled(void) { return m_qbbEnabled; }
 
@@ -173,6 +178,9 @@ public:
    bool m_dynamicth;
    uint32_t m_pausetime;	//< Time for each Pause
    bool m_paused[qCnt];	//< Whether a queue paused
+#if ADAPTIVE
+   Time m_time2Resume[qCnt];
+#endif
    EventId m_resumeEvt[qCnt];
 
    //qcn

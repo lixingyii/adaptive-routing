@@ -80,7 +80,7 @@ MULTI_RATE 0
 SAMPLE_FEEDBACK 0
 
 ENABLE_QCN 1
-USE_DYNAMIC_PFC_THRESHOLD 1
+USE_DYNAMIC_PFC_THRESHOLD 0
 PACKET_PAYLOAD_SIZE 1000
 
 
@@ -112,7 +112,9 @@ lb_modes = {
 
 topo2bdp = {
     "leaf_spine_128_400G_OS2": 156000,  # 2-tier -> all 100Gbps before 104000
-    "fat_k8_100G_OS2": 156000,  # 3-tier -> all 100Gbps
+    "fat_k8_128_400G_OS1": 156000,  # 3-tier -> all 100Gbps
+    "leaf_spine_256_400G_OS1": 156000,
+    "leaf_spine_16_400G_OS1":20000
 }
 
 FLOWGEN_DEFAULT_TIME = 2.0  # see /traffic_gen/traffic_gen.py::base_t
@@ -342,10 +344,12 @@ def main():
         else:
             raise Exception(
                 "Unsupported ConWeave Parameter Setup")
+        cwh_extra_reply_deadline = 1
+        cwh_path_pause_time = 8
     else:
         #### CONWEAVE PARAMETERS (DUMMY) ####
-        cwh_extra_reply_deadline = 4
-        cwh_path_pause_time = 16
+        cwh_extra_reply_deadline = 1
+        cwh_path_pause_time = 8
         cwh_extra_voq_flush_time = 64
         cwh_default_voq_waiting_time = 400
         cwh_tx_expiry_time = 1000

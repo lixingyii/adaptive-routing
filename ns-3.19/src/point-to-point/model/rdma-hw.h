@@ -16,7 +16,7 @@
 #include "rdma-queue-pair.h"
 #include "ns3/assert.h"
 
-#define PER_PACKET_NIC 1
+#define PER_PACKET_NIC 0
 
 namespace ns3 {
 
@@ -203,6 +203,8 @@ class RdmaHw : public Object {
     Time m_irn_rtoLow;
     Time m_irn_rtoHigh;
     uint32_t m_irn_bdp;
+
+    uint32_t m_OOD;
 
 #if PER_PACKET_NIC
     std::map<uint64_t, std::pair<Time, std::priority_queue<std::pair<Ptr<Packet>, CustomHeader>, std::vector<std::pair<Ptr<Packet>, CustomHeader> >, cmp> > > m_pkt_buffer;  // rxKey -> buffer

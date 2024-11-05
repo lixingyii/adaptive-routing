@@ -12,7 +12,7 @@ cecho(){  # source: https://stackoverflow.com/a/53463162/2886168
 
 cecho "GREEN" "Running RDMA Network Load Balancing Simulations (leaf-spine topology)"
 
-TOPOLOGY="leaf_spine_128_400G_OS2" # topology
+TOPOLOGY="fat_k8_128_400G_OS1" # topology
 NETLOAD="75" # network load 75%
 RUNTIME="0.5" # 0.5 second (traffic generation)
 ALGORITHM="all-reduce"
@@ -35,7 +35,9 @@ cecho "GREEN" "Run Lossless RDMA experiments..."
 # sleep 5
 # python3.8 run.py --cc dcqcn --lb letflow --pfc 1 --irn 0 --simul_time ${RUNTIME} --netload ${NETLOAD} --topo ${TOPOLOGY} --algorithm ${ALGORITHM} --implementation ${IMPLEMENTATION} --physical_dims ${PHYSICAL_DIMS} 2>&1 > /dev/null &
 # sleep 5
-python3.8 run.py --cc dcqcn --lb adaptive --pfc 1 --irn 0 --simul_time ${RUNTIME} --netload ${NETLOAD} --topo ${TOPOLOGY} --algorithm ${ALGORITHM} --implementation ${IMPLEMENTATION} --physical_dims ${PHYSICAL_DIMS} 2>&1 > /dev/null &
+# python3.8 run.py --cc dcqcn --lb adaptive --pfc 1 --irn 0 --simul_time ${RUNTIME} --netload ${NETLOAD} --topo ${TOPOLOGY} --algorithm ${ALGORITHM} --implementation ${IMPLEMENTATION} --physical_dims ${PHYSICAL_DIMS} 2>&1 > /dev/null &
+# sleep 5
+python3.8 run.py --cc dcqcn --lb conweave --pfc 1 --irn 0 --simul_time ${RUNTIME} --netload ${NETLOAD} --topo ${TOPOLOGY} --algorithm ${ALGORITHM} --implementation ${IMPLEMENTATION} --physical_dims ${PHYSICAL_DIMS} 2>&1 > /dev/null &
 sleep 5
 
 # IRN RDMA

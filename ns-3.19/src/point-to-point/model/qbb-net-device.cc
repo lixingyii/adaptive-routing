@@ -423,6 +423,10 @@ void QbbNetDevice::Receive(Ptr<Packet> packet) {
             // 则记录 PFC 跟踪信息，将对应队列标记为暂停状态，并安排在一定时间后调用 Resume 函数以恢复队列传输
             m_tracePfc(1);
             m_paused[qIndex] = true;
+#if ADAPTIVE
+            auto now = Simulator::Now();
+            m_time2Resume[qIndex] = now + MicroSeconds(ch.pfc.time);
+#endif
             Simulator::Cancel(m_resumeEvt[qIndex]);
             m_resumeEvt[qIndex] =
                 Simulator::Schedule(MicroSeconds(ch.pfc.time), &QbbNetDevice::Resume, this, qIndex);
@@ -532,6 +536,9 @@ void QbbNetDevice::NewQp(Ptr<RdmaQueuePair> qp) {
 void QbbNetDevice::ReassignedQp(Ptr<RdmaQueuePair> qp) { DequeueAndTransmit(); }
 void QbbNetDevice::TriggerTransmit(void) { DequeueAndTransmit(); }
 bool QbbNetDevice::GetPaused(uint32_t q) { return m_paused[q]; }
+#if ADAPTIVE
+Time QbbNetDevice::GetTime2Resume(uint32_t q) { return m_time2Resume[q]; }
+#endif
 
 void QbbNetDevice::SetQueue(Ptr<BEgressQueue> q) {
     NS_LOG_FUNCTION(this << q);

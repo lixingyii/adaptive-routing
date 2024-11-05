@@ -163,7 +163,8 @@ void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, const std::vect
                 // 如果 flowlet 已存在且未超时，
                 // 则更新 flowlet 信息，增加数据包计数，
                 // 并更新 AdaptiveTag 中的路径信息
-                if (now - flowlet->_activeTime <= m_flowletTimeout) {
+                // if (now - flowlet->_activeTime <= m_flowletTimeout) {
+                if(flowlet->_nPackets <= m_flowletNPackets) {
                     // 更新 flowlet 信息
                     flowlet->_activeTime = now;
                     flowlet->_nPackets++;
@@ -195,7 +196,8 @@ void AdaptiveRouting::RouteInput(Ptr<Packet> p, CustomHeader ch, const std::vect
                     // 更新 flowlet 信息
                     flowlet->_activatedTime = now;
                     flowlet->_activeTime = now;
-                    flowlet->_nPackets++;
+                    // flowlet->_nPackets++;
+                    flowlet->_nPackets = 1;
                     flowlet->_PathId = selectedPath;
 
                     // 更新 adaptiveTag
@@ -333,35 +335,186 @@ uint32_t AdaptiveRouting::GetBestPath(uint32_t dstToRId, const std::vector<Ptr<N
     auto pathItr = m_adaptiveRoutingTable.find(dstToRId);
     assert(pathItr != m_adaptiveRoutingTable.end());
 
-    double minCongestion = std::numeric_limits<double>::max();
     double gamma = 0.5;
     unsigned qIndex = 3;
 
     std::set<uint32_t>::iterator innerPathItr = pathItr->second.begin();
     uint32_t nSample = pathItr->second.size();
-    std::vector<uint32_t> candidatePaths;
-    uint32_t candidatePath = 0;
-    for(uint32_t i = 0; i < nSample; i++) {
+    std::set<uint32_t> candidateOutPorts;
+    std::map<uint32_t, std::vector<uint32_t> > outPort2Paths;
+    for(uint32_t i = 0; i < nSample; i++) {  // 遍历所有路径记录所有可用出端口
         uint32_t pathId = *innerPathItr;
         auto outPort = GetOutPortFromPath(pathId, 0);
-        Ptr<QbbNetDevice> device = DynamicCast<QbbNetDevice>(devices[outPort]);
-        double pause = device->GetPaused(qIndex) ? 1.0 : 0.0;
-        uint32_t qlen = usedEgressPortBytes[outPort];
-        double currCongestion = gamma * pause + (1 - gamma) * ((double)qlen / (double)m_maxBufferBytes);
-        // std::cout << "当前候选路径为" << pathId << "，" << "当前拥塞程度为" << currCongestion << std::endl;
-        if (currCongestion < minCongestion) {
-            minCongestion = currCongestion;
-            candidatePaths.clear();
-            candidatePaths.push_back(pathId);
-        }
-        else if (currCongestion == minCongestion) {
-            candidatePaths.push_back(pathId);
-        }
+        candidateOutPorts.insert(outPort);
+        outPort2Paths[outPort].push_back(pathId);
         std::advance(innerPathItr, 1);
     }
-    candidatePath = candidatePaths[rand() % candidatePaths.size()];
-    // std::cout << "最佳路径为" << candidatePath << "，" << "最小拥塞程度为" << minCongestion << std::endl;
-    return candidatePath;
+
+    // auto now = Simulator::Now();
+    // Time minRemainTime = Seconds(10);
+    // uint32_t candidateOutPort = 0;
+    // for(auto itr = candidateOutPorts.begin(); itr != candidateOutPorts.end(); itr++){
+    //     uint32_t outPort = *itr;
+    //     Ptr<QbbNetDevice> device = DynamicCast<QbbNetDevice>(devices[outPort]);
+    //     Time remainTime = Seconds(0);
+    //     if(device->GetPaused(qIndex)){
+    //         Time time2Resume = device->GetTime2Resume(qIndex);
+    //         if(time2Resume > now){  // 理论上恢复发送时间一定是现在之后的时间
+    //             remainTime = time2Resume - now;
+    //         }
+    //         std::cout << "outport" << outPort << "被PAUSE，还有" << remainTime << "恢复发送" << std::endl;
+    //     }
+    //     uint32_t qlen = usedEgressPortBytes[outPort];
+    //     Time txTime = Seconds(device->GetDataRate().CalculateTxTime(qlen));
+    //     std::cout << "outport" << outPort << "的qlen为" << qlen << "，传输时间为" << txTime << std::endl;
+    //     uint32_t nPacket = usedEgressPortBytes[outPort] / 1048;
+    //     Time delay = NanoSeconds(nPacket * 40);
+    //     remainTime += txTime + delay;
+    //     std::cout << "outport" << outPort << "的pkt数" << nPacket << "，延迟为" << delay << std::endl;
+    //     std::cout << "outport" << outPort << "的发送此Flowlet还需" << remainTime << std::endl;
+    //     if(remainTime < minRemainTime){
+    //         minRemainTime = remainTime;
+    //         candidateOutPort = *itr;
+    //         std::cout << "最优端口candidateOutPort=" << candidateOutPort << "，最短发送时间minRemainTime=" << minRemainTime << std::endl;
+    //     }
+    // }
+    // std::cout << std::endl;
+    // auto candidatePath = outPort2Paths[candidateOutPort].begin();
+    // std::advance(candidatePath, rand() % outPort2Paths[candidateOutPort].size());
+    // return *candidatePath;
+
+    // 随机挑选两个出端口
+    auto candidateOutPort1 = candidateOutPorts.begin();
+    std::advance(candidateOutPort1, rand() % candidateOutPorts.size());
+    uint32_t outPort1 = *candidateOutPort1;
+    // std::cout << "outPort1 = " << outPort1 << std::endl;
+    auto candidateOutPort2 = candidateOutPorts.begin();
+    std::advance(candidateOutPort2, rand() % candidateOutPorts.size());
+    uint32_t outPort2 = *candidateOutPort2;
+    while(outPort2 == outPort1){
+        candidateOutPort2 = candidateOutPorts.begin();
+        std::advance(candidateOutPort2, rand() % candidateOutPorts.size());
+        outPort2 = *candidateOutPort2;
+    }
+    // std::cout << "outPort2 = " << outPort2 << std::endl;
+
+    Ptr<QbbNetDevice> device1 = DynamicCast<QbbNetDevice>(devices[outPort1]);
+    Ptr<QbbNetDevice> device2 = DynamicCast<QbbNetDevice>(devices[outPort2]);
+
+    auto now = Simulator::Now();
+
+    Time remainTime1 = Seconds(0);
+    if(device1->GetPaused(qIndex)){
+        Time time2Resume1 = device1->GetTime2Resume(qIndex);
+        if(time2Resume1 > now){  // 理论上恢复发送时间一定是现在之后的时间
+            remainTime1 = time2Resume1 - now;
+        }
+#if DEBUG
+        std::cout << "outport" << outPort1 << "被PAUSE，还有" << remainTime1 << "恢复发送" << std::endl;
+#endif
+    }
+    uint32_t qlen1 = usedEgressPortBytes[outPort1];
+    Time txTime1 = Seconds(device1->GetDataRate().CalculateTxTime(qlen1));
+#if DEBUG
+    std::cout << "outport" << outPort1 << "的qlen为" << qlen1 << "，传输时间为" << txTime1 << std::endl;
+#endif
+    uint32_t nPacket1 = usedEgressPortBytes[outPort1] / 1048;
+    Time delay1 = NanoSeconds(nPacket1 * 40);
+    remainTime1 += txTime1 + delay1;
+#if DEBUG
+    std::cout << "outport" << outPort1 << "的pkt数" << nPacket1 << "，延迟为" << delay1 << std::endl;
+    std::cout << "outport" << outPort1 << "的发送此Flowlet还需" << remainTime1 << std::endl;
+#endif
+
+    Time remainTime2 = Seconds(0);
+    if(device2->GetPaused(qIndex)){
+        Time time2Resume2 = device2->GetTime2Resume(qIndex);
+        if(time2Resume2 > now){  // 理论上恢复发送时间一定是现在之后的时间
+            remainTime2 = time2Resume2 - now;
+        }
+#if DEBUG
+        std::cout << "outport" << outPort2 << "被PAUSE，还有" << remainTime2 << "恢复发送" << std::endl;
+#endif
+    }
+    uint32_t qlen2 = usedEgressPortBytes[outPort2];
+    Time txTime2 = Seconds(device2->GetDataRate().CalculateTxTime(qlen2));
+#if DEBUG
+    std::cout << "outport" << outPort2 << "的qlen为" << qlen2 << "，传输时间为" << txTime2 << std::endl;
+#endif
+    uint32_t nPacket2 = usedEgressPortBytes[outPort2] / 1048;
+    Time delay2 = NanoSeconds(nPacket2 * 40);
+    remainTime2 += txTime2 + delay2;
+#if DEBUG
+    std::cout << "outport" << outPort2 << "的pkt数" << nPacket2 << "，延迟为" << delay2 << std::endl;
+    std::cout << "outport" << outPort2 << "的发送此Flowlet还需" << remainTime2 << std::endl;
+#endif
+
+    if(remainTime1 <= remainTime2) {
+        auto candidatePath = outPort2Paths[outPort1].begin();
+        std::advance(candidatePath, rand() % outPort2Paths[outPort1].size());
+#if DEBUG
+        std::cout << "最优端口candidateOutPort=" << outPort1 << "，最短发送时间minRemainTime=" << remainTime1 << std::endl;
+        std::cout << std::endl;
+#endif
+        return *candidatePath;
+    }
+    else{
+        auto candidatePath = outPort2Paths[outPort2].begin();
+        std::advance(candidatePath, rand() % outPort2Paths[outPort2].size());
+#if DEBUG
+        std::cout << "最优端口candidateOutPort=" << outPort2 << "，最短发送时间minRemainTime=" << remainTime2 << std::endl;
+        std::cout << std::endl;
+#endif
+        return *candidatePath;
+    }
+
+
+
+    // double pause1 = device1->GetPaused(qIndex) ? 1.0 : 0.0;
+    // uint32_t qlen1 = usedEgressPortBytes[outPort1];
+    // double currCongestion1 = gamma * pause1 + (1 - gamma) * ((double)qlen1 / (double)m_maxBufferBytes);
+    // Ptr<QbbNetDevice> device2 = DynamicCast<QbbNetDevice>(devices[outPort2]);
+    // double pause2 = device2->GetPaused(qIndex) ? 1.0 : 0.0;
+    // uint32_t qlen2 = usedEgressPortBytes[outPort2];
+    // double currCongestion2 = gamma * pause2 + (1 - gamma) * ((double)qlen2 / (double)m_maxBufferBytes);
+
+    // if(currCongestion1 <= currCongestion2){
+    //     auto candidatePath = outPort2Paths[outPort1].begin();
+    //     std::advance(candidatePath, rand() % outPort2Paths[outPort1].size());
+    //     return *candidatePath;
+    // }
+    // else{
+    //     auto candidatePath = outPort2Paths[outPort2].begin();
+    //     std::advance(candidatePath, rand() % outPort2Paths[outPort2].size());
+    //     return *candidatePath;
+    // }
+
+    // double minCongestion = std::numeric_limits<double>::max();
+    // uint32_t candidatePath = 0;
+    // std::set<uint32_t>::iterator innerPathItr = pathItr->second.begin();
+    // uint32_t nSample = pathItr->second.size();
+    // std::vector<uint32_t> candidatePaths;
+    // for(uint32_t i = 0; i < nSample; i++) {
+    //     uint32_t pathId = *innerPathItr;
+    //     auto outPort = GetOutPortFromPath(pathId, 0);
+    //     Ptr<QbbNetDevice> device = DynamicCast<QbbNetDevice>(devices[outPort]);
+    //     double pause = device->GetPaused(qIndex) ? 1.0 : 0.0;
+    //     uint32_t qlen = usedEgressPortBytes[outPort];
+    //     double currCongestion = gamma * pause + (1 - gamma) * ((double)qlen / (double)m_maxBufferBytes);
+    //     // std::cout << "当前候选路径为" << pathId << "，" << "当前拥塞程度为" << currCongestion << std::endl;
+    //     if (currCongestion < minCongestion) {
+    //         minCongestion = currCongestion;
+    //         candidatePaths.clear();
+    //         candidatePaths.push_back(pathId);
+    //     }
+    //     else if (currCongestion == minCongestion) {
+    //         candidatePaths.push_back(pathId);
+    //     }
+    //     std::advance(innerPathItr, 1);
+    // }
+    // candidatePath = candidatePaths[rand() % candidatePaths.size()];
+    // // std::cout << "最佳路径为" << candidatePath << "，" << "最小拥塞程度为" << minCongestion << std::endl;
+    // return candidatePath;
 }
 
 uint32_t AdaptiveRouting::GetOutPortFromPath(const uint32_t& path, const uint32_t& hopCount) {
@@ -375,11 +528,11 @@ void AdaptiveRouting::SetOutPortToPath(uint32_t& path, const uint32_t& hopCount,
     ((uint8_t*)&path)[hopCount] = outPort;
 }
 
-void AdaptiveRouting::SetConstants(Time agingTime, Time flowletTimeout) {
-    
+void AdaptiveRouting::SetConstants(Time agingTime, Time flowletTimeout, uint32_t flowletNPackets) { 
 #if PER_FLOWLET
     m_agingTime = agingTime;
     m_flowletTimeout = flowletTimeout;
+    m_flowletNPackets = flowletNPackets;
 #endif
 }
 
